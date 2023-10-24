@@ -1,7 +1,8 @@
-from semantic_search import create_embeddings, get_answer
+# from semantic_search import create_embeddings, get_answer
+from calculator import calculate
 
-index = create_embeddings()
-
+# The code tests the semantic search
+'''index = create_embeddings()
 while True:
     user_input = input("Enter a value (type 'exit' to quit): ")
     if user_input == 'exit':
@@ -11,4 +12,16 @@ while True:
     # Do something with the user input
     print("You entered:", user_input)
     print(index)
+    print(ans)'''
+
+
+# this code test the calculator
+while True:
+    user_input = input("Enter a value (type 'exit' to quit): ")
+    if user_input == 'exit':
+        break
+    else:
+        ans = calculate(user_input)
+    # Do something with the user input
+    print("You entered:", user_input)
     print(ans)
