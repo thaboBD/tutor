@@ -1,0 +1,10 @@
+.vscode
+.env
+__pycache__
+venv
+private_key.json
+#exclude from git uploads folder
+uploads
+test.py
+.jpeg
+images
