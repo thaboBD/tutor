@@ -1,6 +1,6 @@
 # from semantic_search import create_embeddings, get_answer
-from calculator import calculate
-
+# from calculator import calculate
+from langchain_util import run_agent
 # The code tests the semantic search
 '''index = create_embeddings()
 while True:
@@ -21,7 +21,7 @@ while True:
     if user_input == 'exit':
         break
     else:
-        ans = calculate(user_input)
+        ans = run_agent(user_input)
     # Do something with the user input
     print("You entered:", user_input)
     print(ans)
