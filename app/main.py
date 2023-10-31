@@ -1,11 +1,28 @@
 from fastapi import UploadFile, File, FastAPI
 from typing import List
 from pdf_util import extract_pdf_text
+from semantic_search import get_answer
+from calculator import calculate as calculated
+from pydantic import BaseModel
+import logging
+
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 
 app = FastAPI()
 
 # This will store our content indexed by some identifier
 content_index = {}
+
+
+class QueryModel(BaseModel):
+    query: str
+
+
+@app.get("/")
+def home():
+    return "Welcome to the home page."
 
 
 @app.post("/upload/")
@@ -25,10 +42,14 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
     return responses
 
 
-@app.get("/search/")
-def search_content(query: str):
-    # A simple search mechanism (this can be improved greatly with proper search algorithms)
-    results = {key: value for key, value in content_index.items()
-               if query in value}
+@app.post("/search/")
+def search(query: QueryModel):
+    results = get_answer(query.query)
 
+    return results
+
+
+@app.post("/calculate/")
+async def calculate(query: QueryModel):
+    results = calculated(query.query)
     return results
