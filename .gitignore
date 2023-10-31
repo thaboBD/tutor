@@ -9,4 +9,4 @@ test.py
 .jpeg
 images
 data
-.log
+app.log
