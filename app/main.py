@@ -10,6 +10,7 @@ import logging
 import os
 from datetime import datetime
 from mathpix import readImage
+from gpt import getGptResponse
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -80,3 +81,9 @@ async def upload_image(file: UploadFile = File(...)):
         return JSONResponse(status_code=200, content={"filename": file.filename, "image_string": image_string})
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
+
+
+@app.post("/exercises/")
+async def calculate(query: QueryModel):
+    results = getGptResponse(query.query)
+    return results
