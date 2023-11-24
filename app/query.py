@@ -1,9 +1,10 @@
 # from semantic_search import create_embeddings, get_answer
 # from calculator import calculate
 # from langchain_util import run_agent
-from gpt import getGptResponse
+# from gpt import getGptResponse
 # The code tests the semantic search
-'''index = create_embeddings()
+'''index = create_embeddings()'''
+
 while True:
     user_input = input("Enter a value (type 'exit' to quit): ")
     if user_input == 'exit':
@@ -12,8 +13,7 @@ while True:
         ans = get_answer(user_input)
     # Do something with the user input
     print("You entered:", user_input)
-    print(index)
-    print(ans)'''
+    print(ans)
 
 '''
 # this code test the calculator
@@ -28,7 +28,7 @@ while True:
     print(ans)
     '''
 
-while True:
+'''while True:
     user_input = input("Enter a value (type 'exit' to quit): ")
     if user_input == 'exit':
         break
@@ -36,4 +36,4 @@ while True:
         ans = getGptResponse(user_input)
     # Do something with the user input
     print("You entered:", user_input)
-    print(ans)
+    print(ans)'''

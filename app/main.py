@@ -1,9 +1,8 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
 from typing import List
 from pdf_util import extract_pdf_text
 # from semantic_search import get_answer
-# from calculator import calculate as calculated
 from langchain_util import run_agent as calculated
 from pydantic import BaseModel
 import logging
@@ -11,12 +10,17 @@ import os
 from datetime import datetime
 from mathpix import readImage
 from gpt import getGptResponse
+import chatbot as bot
+from models import WhatsAppMessage, QueryModel, whatsapp_message_form
+
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 app = FastAPI()
+cb = bot.Chatbot()  # Create an instance of Chatbot
+
 
 os.makedirs('images', exist_ok=True)
 
@@ -24,46 +28,25 @@ os.makedirs('images', exist_ok=True)
 content_index = {}
 
 
-class QueryModel(BaseModel):
-    query: str
-
-
 @app.get("/")
 def home():
     return "Welcome to the home page."
 
 
-@app.post("/upload/")
-async def upload_pdfs(files: List[UploadFile] = File(...)):
-    responses = []
-
-    for file in files:
-        # Extracting text from uploaded PDF
-        pdf_text = extract_pdf_text(file.file)
-
-        # Indexing the extracted content (using file filename as the key for simplicity)
-        content_index[file.filename] = pdf_text
-
-        responses.append({"filename": file.filename,
-                         "message": "PDF uploaded and indexed successfully."})
-
-    return responses
-
-
-@app.post("/search/")
+@app.post("api/search/")
 def search(query: QueryModel):
-    # results = get_answer(query.query)
+    results = get_answer(query.query)
 
     return results
 
 
-@app.post("/calculate/")
+@app.post("api/calculate/")
 async def calculate(query: QueryModel):
     results = calculated(query.query)
     return results
 
 
-@app.post("/read-image/")
+@app.post("api/read-image/")
 async def upload_image(file: UploadFile = File(...)):
     if not file.content_type.startswith('image/'):
         raise HTTPException(
@@ -83,7 +66,14 @@ async def upload_image(file: UploadFile = File(...)):
         return JSONResponse(status_code=500, content={"message": str(e)})
 
 
-@app.post("/exercises/")
+@app.post("api/exercises/")
 async def calculate(query: QueryModel):
     results = getGptResponse(query.query)
     return results
+
+
+@app.post("/api/getmessage")
+async def chat(payload: WhatsAppMessage = Depends(whatsapp_message_form)):
+
+    cb.processInput(payload)
+    return {"message": "success"}
