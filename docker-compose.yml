@@ -2,10 +2,10 @@ version: "3.8"
 
 services:
   client:
-    build: ./node-app
+    build: ./nodejs-integrator
     command: sh -c "npm install && npm start"
     volumes:
-      - ./node-app:/app/node-app
+      - ./nodejs-integrator:/app/nodejs-integrator
     ports:
       - 3000:3000
     networks:
@@ -13,7 +13,7 @@ services:
     depends_on:
       - postgresdb
     env_file:
-      - ./node-app/.env
+      - ./nodejs-integrator/.env
     environment:
       - DB_HOST=postgresdb
 
@@ -35,7 +35,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-    env_file: ./node-app/.env
+    env_file: ./nodejs-integrator/.env
     networks:
       - app-network
     healthcheck:

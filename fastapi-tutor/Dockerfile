@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.9.18-slim-bullseye
 
 RUN apt-get update && \
     apt-get install -y libpq-dev && \

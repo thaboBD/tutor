@@ -8,7 +8,7 @@ const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 
 const userRouter = require("./routes/userRoutes");
-const twilioRouter = require("./routes/twilioRoutes");
+const conversationRouter = require("./routes/conversationRoutes");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 
 // API Routes
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/conversations", twilioRouter);
+app.use("/api/v1/conversations", conversationRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
