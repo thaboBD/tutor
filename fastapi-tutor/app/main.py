@@ -1,20 +1,19 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from typing import List
-from pdf_util import extract_pdf_text
-# from semantic_search import get_answer
+from .pdf_util import extract_pdf_text
+# from .semantic_search import get_answer
 # from calculator import calculate as calculated
-from langchain_util import run_agent as calculated
+from .langchain_util import run_agent as calculated
 from pydantic import BaseModel
 import logging
 import os
 from datetime import datetime
-from mathpix import readImage
-from gpt import getGptResponse
+from .mathpix import readImage
+from .gpt import getGptResponse
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 
 app = FastAPI()
 
@@ -28,9 +27,29 @@ class QueryModel(BaseModel):
     query: str
 
 
+class FulfillmentResponse(BaseModel):
+    fulfillmentText: str
+
 @app.get("/")
 def home():
     return "Welcome to the home page."
+
+@app.post("/webhook", response_model=FulfillmentResponse)
+async def webhook(info : Request):
+    json_request = await info.json()
+    intent = json_request["queryResult"]["intent"]["displayName"]
+    query = json_request["queryResult"]["queryText"]
+
+    result = None
+    if(intent == 'calculate'):
+        result = await calculate(QueryModel(query=query))
+    if(intent == 'exercises'):
+        result = await exercises(QueryModel(query=query))
+    if(intent == 'search-topic'):
+        result = await calculate(QueryModel(query=query))
+
+    response = FulfillmentResponse(fulfillmentText=result)
+    return response
 
 
 @app.post("/upload/")
@@ -52,9 +71,9 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 
 @app.post("/search/")
 def search(query: QueryModel):
-    # results = get_answer(query.query)
+    results = get_answer(query.query)
 
-    return results
+    return 'results'
 
 
 @app.post("/calculate/")
@@ -62,6 +81,10 @@ async def calculate(query: QueryModel):
     results = calculated(query.query)
     return results
 
+@app.post("/exercises/")
+async def exercises(query: QueryModel):
+    results = getGptResponse(query.query)
+    return results
 
 @app.post("/read-image/")
 async def upload_image(file: UploadFile = File(...)):
@@ -82,8 +105,3 @@ async def upload_image(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
-
-@app.post("/exercises/")
-async def calculate(query: QueryModel):
-    results = getGptResponse(query.query)
-    return results

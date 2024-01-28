@@ -12,7 +12,7 @@ router.post(
 router.post(
   "/response",
   authController.protect,
-  conversationsController.awsResponseHook
+  conversationsController.fastApiResponseHook
 );
 
 module.exports = router;

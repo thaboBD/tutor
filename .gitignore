@@ -11,3 +11,4 @@ images/
 data/
 app.log/
 node_modules/
+dialogflow-credentials.json/
