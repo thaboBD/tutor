@@ -11,6 +11,10 @@ import os
 from datetime import datetime
 from .mathpix import readImage
 from .gpt import getGptResponse
+import requests
+from pprint import pprint
+
+webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -34,11 +38,20 @@ class FulfillmentResponse(BaseModel):
 def home():
     return "Welcome to the home page."
 
+class DialogflowPayload(BaseModel):
+    # Define a Pydantic model to represent the Dialogflow payload
+    queryResult: dict
+
+
 @app.post("/webhook", response_model=FulfillmentResponse)
 async def webhook(info : Request):
     json_request = await info.json()
+
     intent = json_request["queryResult"]["intent"]["displayName"]
     query = json_request["queryResult"]["queryText"]
+    contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1]
+
+    print(contextNumber)
 
     result = None
     if(intent == 'calculate'):
@@ -48,7 +61,10 @@ async def webhook(info : Request):
     if(intent == 'search-topic'):
         result = await calculate(QueryModel(query=query))
 
+    if result: requests.post(webhook_url, data={'result': result, 'From': contextNumber})
+
     response = FulfillmentResponse(fulfillmentText=result)
+
     return response
 
 

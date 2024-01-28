@@ -4,7 +4,7 @@ const fs = require("fs");
 const uuid = require("uuid");
 const catchAsync = require("../utils/catchAsync");
 
-exports.requestDialogflow = catchAsync(async (query) => {
+exports.requestDialogflow = catchAsync(async (query, phoneNumber) => {
   const projectId = process.env.DIALOGFLOW_PROJECTID;
   const keyFilePath = process.env.DIALOGFLOW_CREDENTIALS_PATH;
   const sessionId = uuid.v4();
@@ -26,8 +26,15 @@ exports.requestDialogflow = catchAsync(async (query) => {
         languageCode: "en-US",
       },
     },
+    queryParams: {
+      contexts: [
+        {
+          name: `projects/${projectId}/agent/sessions/abuzar/contexts/${phoneNumber}`,
+          lifespanCount: 5,
+        },
+      ],
+    },
   };
-
   const responses = await sessionClient.detectIntent(request);
   const result = responses[0].queryResult.fulfillmentText;
   const queryText = responses[0].queryResult.queryText;

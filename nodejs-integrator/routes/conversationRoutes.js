@@ -11,7 +11,7 @@ router.post(
 );
 router.post(
   "/response",
-  authController.protect,
+  // authController.protect,
   conversationsController.fastApiResponseHook
 );
 
