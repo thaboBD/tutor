@@ -20,6 +20,7 @@ logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = FastAPI()
+app.mount("/fast-api", app)
 
 os.makedirs('images', exist_ok=True)
 
@@ -80,7 +81,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         content_index[file.filename] = pdf_text
 
         responses.append({"filename": file.filename,
-                         "message": "PDF uploaded and indexed successfully."})
+                        "message": "PDF uploaded and indexed successfully."})
 
     return responses
 
