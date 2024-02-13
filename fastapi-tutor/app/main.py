@@ -13,6 +13,7 @@ from .mathpix import readImage
 from .gpt import getGptResponse
 import requests
 from pprint import pprint
+import asyncio
 
 webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
 
@@ -66,14 +67,16 @@ async def webhook(info : Request):
         print("IMAGE INTENT")
         result = 123
 
-    if result:
-        return requests.post(webhook_url, data={'result': result, 'From': contextNumber})
-
-
     response = FulfillmentResponse(fulfillmentText=result)
+
+    if result:
+        asyncio.create_task(send_webhook_request(contextNumber, result))
 
     return response
 
+async def send_webhook_request(contextNumber, result):
+    data = {'result': result, 'From': contextNumber}
+    await requests.post(webhook_url, data=data)
 
 @app.post("/upload/")
 async def upload_pdfs(files: List[UploadFile] = File(...)):
