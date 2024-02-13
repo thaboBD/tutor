@@ -50,7 +50,8 @@ async def webhook(info : Request):
 
     intent = json_request["queryResult"]["intent"]["displayName"]
     query = json_request["queryResult"]["queryText"]
-    contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1]
+    contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[0]
+    imageUrl = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[1]
 
     print(contextNumber)
 
@@ -61,8 +62,13 @@ async def webhook(info : Request):
         result = await exercises(QueryModel(query=query))
     if(intent == 'search-topic'):
         result = await calculate(QueryModel(query=query))
+    if(intent == 'image'):
+        print("IMAGE INTENT")
+        result = 123
 
-    if result: requests.post(webhook_url, data={'result': result, 'From': contextNumber})
+    if result:
+        return requests.post(webhook_url, data={'result': result, 'From': contextNumber})
+
 
     response = FulfillmentResponse(fulfillmentText=result)
 
