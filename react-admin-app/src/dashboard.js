@@ -13,9 +13,10 @@ import {
 } from "@mui/material";
 
 const UsersApi = `${process.env.REACT_APP_API_URL}/api/v1/users`;
-console.log("**************");
+
+console.log("******************");
 console.log(UsersApi);
-console.log("**************");
+console.log("******************");
 
 const Dashboard = () => {
   const [phoneNumber, setphoneNumber] = useState("");

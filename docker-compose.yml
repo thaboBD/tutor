@@ -38,6 +38,8 @@ services:
       - 3001:3001
     networks:
       - app-network
+    env_file:
+      - ./react-admin-app/.env
 
   postgresdb:
     image: postgres:15-alpine
