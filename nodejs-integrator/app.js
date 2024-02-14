@@ -4,8 +4,8 @@ const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const xss = require("xss-clean");
-const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const userRouter = require("./routes/userRoutes");
 const conversationRouter = require("./routes/conversationRoutes");
@@ -23,6 +23,10 @@ app.use(helmet());
 // Development logging
 app.use(morgan("dev"));
 
+const corsOption = {
+  origin: ["http://localhost:3001"],
+};
+app.use(cors(corsOption));
 // Limit requests from same API
 const limiter = rateLimit({
   max: 100,

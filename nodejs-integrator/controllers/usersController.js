@@ -58,3 +58,12 @@ exports.makeSuperUser = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.allUsers = catchAsync(async (req, res, next) => {
+  const users = await User.findAll({});
+
+  res.status(200).json({
+    status: "success",
+    users,
+  });
+});

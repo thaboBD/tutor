@@ -14,4 +14,6 @@ router.patch(
   usersController.makeSuperUser
 );
 
+router.get("/", usersController.allUsers);
+
 module.exports = router;

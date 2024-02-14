@@ -26,13 +26,14 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   if (!req.user) {
     (message =
       "This phone number is not registered for conversation, please get yourself registered first. Thanks"),
-      sendTwilioResponse(message, senderNumber);
+      (message, senderNumber);
   }
 
   // will upload to s3 if required
   // const imageLocation = uploadFile(mediaItem);
 
   const query = NumMedia > 0 ? "image" : Body;
+
   const result = requestDialogFlow(senderNumber, query, mediaUrl);
 
   if (result) sendTwilioResponse(result, senderNumber);
@@ -42,10 +43,6 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
 
 exports.fastApiResponseHook = catchAsync(async (req, res, next) => {
   const { result, From: senderNumber } = req.body;
-
-  console.log("*******************");
-  console.log(result);
-  console.log("*******************");
 
   if (result) sendTwilioResponse(result, senderNumber);
 

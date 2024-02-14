@@ -51,10 +51,19 @@ async def webhook(info : Request):
 
     intent = json_request["queryResult"]["intent"]["displayName"]
     query = json_request["queryResult"]["queryText"]
-    contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[0]
+
+    outputContext = json_request["queryResult"]["outputContexts"][0]["name"]
+
+    contextNumber = None
+    if 'thabochatbot' in outputContext:
+        contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[0]
+
     imageUrl = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[1]
 
+    print("**************")
     print(contextNumber)
+    print("**************")
+
 
     result = None
     if(intent == 'calculate'):
@@ -69,12 +78,14 @@ async def webhook(info : Request):
 
     response = FulfillmentResponse(fulfillmentText=result)
 
-    if result:
-        asyncio.create_task(send_webhook_request(contextNumber, result))
+    if result and contextNumber:
+        data = {'result': result, 'From': contextNumber}
+        requests.post(webhook_url, data=data)
 
     return response
 
 async def send_webhook_request(contextNumber, result):
+    print("CALLINGs")
     data = {'result': result, 'From': contextNumber}
     await requests.post(webhook_url, data=data)
 

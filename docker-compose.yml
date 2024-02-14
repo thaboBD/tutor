@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  client:
+  node-server:
     build: ./nodejs-integrator
     command: sh -c "npm install && npm start"
     volumes:
@@ -17,7 +17,7 @@ services:
     environment:
       - DB_HOST=postgresdb
 
-  server:
+  fastapi-server:
     build: ./fastapi-tutor
     command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
@@ -28,6 +28,16 @@ services:
       - app-network
     env_file:
       - ./fastapi-tutor/.env
+
+  react-sever:
+    build: ./react-admin-app
+    command: sh -c "npm install && npm start"
+    volumes:
+      - ./react-admin-app:/react-admin-app
+    ports:
+      - 3001:3001
+    networks:
+      - app-network
 
   postgresdb:
     image: postgres:15-alpine
