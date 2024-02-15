@@ -13,9 +13,8 @@ from .mathpix import readImage
 from .gpt import getGptResponse
 import requests
 from pprint import pprint
+import aiohttp
 import asyncio
-
-webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -47,47 +46,15 @@ class DialogflowPayload(BaseModel):
 
 @app.post("/webhook", response_model=FulfillmentResponse)
 async def webhook(info : Request):
-    json_request = await info.json()
-
-    intent = json_request["queryResult"]["intent"]["displayName"]
-    query = json_request["queryResult"]["queryText"]
-
-    outputContext = json_request["queryResult"]["outputContexts"][0]["name"]
-
-    contextNumber = None
-    if 'thabochatbot' in outputContext:
-        contextNumber = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[0]
-
-    imageUrl = json_request["queryResult"]["outputContexts"][0]["name"].split('/')[-1].split('-')[1]
-
-    print("**************")
-    print(contextNumber)
-    print("**************")
-
-
-    result = None
-    if(intent == 'calculate'):
-        result = await calculate(QueryModel(query=query))
-    if(intent == 'exercises'):
-        result = await exercises(QueryModel(query=query))
-    if(intent == 'search-topic'):
-        result = await calculate(QueryModel(query=query))
-    if(intent == 'image'):
-        print("IMAGE INTENT")
-        result = 123
-
+    intent, query, context_number, imageUrl = await extract_data_from_request(info)
+    result = await decide_intent_find_result(intent, query)
     response = FulfillmentResponse(fulfillmentText=result)
 
-    if result and contextNumber:
-        data = {'result': result, 'From': contextNumber}
-        requests.post(webhook_url, data=data)
+    if result and context_number:
+        await send_webhook_request(result, context_number)
 
     return response
 
-async def send_webhook_request(contextNumber, result):
-    print("CALLINGs")
-    data = {'result': result, 'From': contextNumber}
-    await requests.post(webhook_url, data=data)
 
 @app.post("/upload/")
 async def upload_pdfs(files: List[UploadFile] = File(...)):
@@ -142,3 +109,50 @@ async def upload_image(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
+async def extract_data_from_request(info):
+    try:
+        json_request = await info.json()
+        query_result = json_request.get("queryResult", {})
+        output_contexts = query_result.get("outputContexts", [])
+        output_context = output_contexts[0]["name"] if output_contexts else None
+
+        intent = query_result.get("intent", {}).get("displayName", None)
+        query = query_result.get("queryText", None)
+        context_number = None
+        imageUrl = None
+
+        '''
+            'specialidentifier' in outputContext is
+                true when the endpoint is hit through node js app
+                false when the endpoint is hit through dialog-flow
+        '''
+        if 'specialidentifier' in output_context:
+            data = output_context.split('/')[-1].split('-')
+            if len(data) == 3:
+                context_number, imageUrl = data[1], data[2]
+
+        return intent, query, context_number, imageUrl
+    except Exception as e:
+        print("Exception occurred while extracting data from request:", e)
+        return None, None, None, None
+
+async def decide_intent_find_result(intent, query):
+    if intent == 'calculate':
+        return await calculate(QueryModel(query=query))
+    elif intent == 'exercises':
+        return await exercises(QueryModel(query=query))
+    elif intent == 'search-topic':
+        return await calculate(QueryModel(query=query))
+    elif intent == 'image':
+        print("IMAGE INTENT")
+        return 123
+    else:
+        return 'None'
+
+async def send_webhook_request(result, context_number):
+        webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
+
+        data = {'result': result, 'From': context_number}
+        async with aiohttp.ClientSession() as session:
+            async with session.post(webhook_url, data=data) as response:
+                return await response.text()
