@@ -43,7 +43,8 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
 
 exports.fastApiResponseHook = catchAsync(async (req, res, next) => {
   const { result, From: senderNumber } = req.body;
-
+  console.log("fastApiResponseHook");
+  console.log(("senderNumber", senderNumber));
   if (result) sendTwilioResponse(result, senderNumber);
 
   res.type("text/xml").send("success");
