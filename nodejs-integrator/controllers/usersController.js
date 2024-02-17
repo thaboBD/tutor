@@ -37,7 +37,6 @@ const catchAsync = require("./../utils/catchAsync");
  */
 exports.makeSuperUser = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  console.log(userId);
   const user = await User.findByPk(userId);
 
   if (!user) {
