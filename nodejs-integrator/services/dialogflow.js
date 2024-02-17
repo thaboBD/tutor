@@ -18,10 +18,11 @@ exports.requestDialogFlow = catchAsync(
       sessionId
     );
 
-    console.log("MEDIA URL", mediaUrl);
+    const encodedString = encodeURIComponent(mediaUrl);
+
+    console.log("MEDIA URL", encodedString);
     console.log(query);
 
-    const encodedString = encodeURIComponent(mediaUrl);
     const request = {
       session: sessionPath,
       queryInput: {
@@ -33,7 +34,7 @@ exports.requestDialogFlow = catchAsync(
       queryParams: {
         contexts: [
           {
-            name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier-${phoneNumber}-${encodedString}`,
+            name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier-${phoneNumber}`,
             lifespanCount: 5,
           },
         ],

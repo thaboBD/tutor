@@ -39,16 +39,15 @@ class FulfillmentResponse(BaseModel):
 def home():
     return "Welcome to the home page."
 
-class DialogflowPayload(BaseModel):
-    # Define a Pydantic model to represent the Dialogflow payload
-    queryResult: dict
-
-
 @app.post("/webhook", response_model=FulfillmentResponse)
 async def webhook(info : Request):
+    print("WHEBHOOK CALLED")
     intent, query, context_number, imageUrl = await extract_data_from_request(info)
-    result = await decide_intent_find_result(intent, query)
+    result = await decide_intent_find_result(intent, query, imageUrl)
     response = FulfillmentResponse(fulfillmentText=result)
+
+    print("IMAGe URL", imageUrl)
+    print("Inent", intent)
 
     if result and context_number:
         await send_webhook_request(result, context_number)
@@ -136,7 +135,7 @@ async def extract_data_from_request(info):
         print("Exception occurred while extracting data from request:", e)
         return None, None, None, None
 
-async def decide_intent_find_result(intent, query):
+async def decide_intent_find_result(intent, query, imageUrl):
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
