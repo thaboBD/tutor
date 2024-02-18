@@ -71,7 +71,9 @@ exports.deleteUser = catchAsync(async(req,res,next) => {
 })
 
 exports.allUsers = catchAsync(async (req, res, next) => {
-  const users = await User.findAll({});
+  const users = await User.findAll({
+    attributes: ["id", "phoneNumber"],
+  });
 
   res.status(200).json({
     status: "success",
