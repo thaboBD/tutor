@@ -58,13 +58,12 @@ exports.logout = (req, res) => {
 exports.protect = catchAsync(async (req, res, next) => {
   const currentUser = await User.findOne({
     where: {
-      phoneNumber: req.body.From,
+      phoneNumber: { [Op.like]: `%${req.body.From}` },
     },
   });
 
   console.log("CURRENT USRER", currentUser)
   console.log("FROM", req.body.From)
-  console.log("USERS", await User.findAll({}))
 
   req.user = currentUser;
   res.locals.user = currentUser;
