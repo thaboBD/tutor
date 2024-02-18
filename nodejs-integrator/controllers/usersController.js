@@ -58,6 +58,18 @@ exports.makeSuperUser = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deleteUser = catchAsync(async(req,res,next) => {
+  const user = await User.findByPk(req.body.userId)
+
+  if(!user)return next(new AppError("User not found", 400))
+
+  await user.destroy()
+
+  res.status(200).json({
+    status: "deleted",
+  });
+})
+
 exports.allUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll({});
 
