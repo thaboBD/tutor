@@ -20,8 +20,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
 
 const UsersApi = `${process.env.REACT_APP_API_URL}/api/v1/users`;
+const authToken = localStorage.getItem("token");
 
-const Dashboard = () => {
+const Dashboard = ({setIsLoggedIn}) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [data, setData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,19 +36,35 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(UsersApi);
+      console.log("USERS API", UsersApi)
+      const response = await axios.get(UsersApi, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": "69420"
+        }
+      });
+      console.log(response)
+      // if (!response.data.users) throw Error;
+
       setData(response.data.users);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setNotification({ type: "error", message: "Failed to fetch data" });
     }
   };
 
   const handleCreate = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${UsersApi}/signup`, {
-        phoneNumber: newPhoneNumber,
-      });
+      const response = await axios.post(
+        `${UsersApi}/signup`,
+        { phoneNumber: newPhoneNumber },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
       setModalOpen(false);
       fetchData();
       setNotification({ type: "success", message: "Phone number added successfully" });
@@ -62,7 +79,12 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       try {
-        await axios.delete(`${UsersApi}`, { data: { id } });
+        await axios.delete(`${UsersApi}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          data: { id },
+        });
         fetchData();
         setNotification({ type: "success", message: "Record deleted successfully" });
       } catch (error) {
@@ -76,13 +98,28 @@ const Dashboard = () => {
     setNotification(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
+
   return (
     <div className="dashboard-container" style={{ padding: "20px" }}>
+      <Button
+        variant="contained"
+        color="secondary"
+        style={{ position: "absolute", top: 20, right: 20 }}
+        onClick={handleLogout}
+      >
+        Logout
+      </Button>
+
       <Typography variant="h4" align="center" gutterBottom>
         Thabo Chatbot Admin Panel
       </Typography>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <form onSubmit={handleCreate}>
         <div
           style={{
             position: "absolute",
@@ -108,6 +145,7 @@ const Dashboard = () => {
             {loading ? <CircularProgress size={24} /> : "Create"}
           </Button>
         </div>
+        </form>
       </Modal>
 
       <div className="table-container" style={{ margin: "auto", maxWidth: "80%" }}>
@@ -118,7 +156,7 @@ const Dashboard = () => {
         >
           Add Mobile Number
         </Button>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -142,6 +180,7 @@ const Dashboard = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
       </div>
 
       <Snackbar open={!!notification} autoHideDuration={6000} onClose={handleNotificationClose}>
