@@ -15,5 +15,6 @@ router.patch(
 );
 
 router.get("/", usersController.allUsers);
+router.delete('/', usersController.deleteUser);
 
 module.exports = router;
