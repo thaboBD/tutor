@@ -8,4 +8,11 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 3000
+# Copy the startup script into the container
+COPY startup.sh .
+
+# Make the script executable
+RUN chmod +x startup.sh
+
+# Run the startup script
+CMD ["./startup.sh"]
