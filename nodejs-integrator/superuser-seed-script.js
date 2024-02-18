@@ -11,6 +11,7 @@ const seedSuperUser = catchAsync(async () => {
       lastName: "dube",
       email: "thabodube@chatbot.com",
       password: "!thabodube?",
+      phoneNumber: "+13203628618",
       superUser: true,
     });
 
