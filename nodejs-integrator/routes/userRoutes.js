@@ -7,14 +7,8 @@ const router = express.Router();
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.get("/logout", authController.logout);
-router.patch(
-  "/:userId/make-super-user",
-  authController.protect,
-  authController.restrictToSuperUser,
-  usersController.makeSuperUser
-);
 
-router.get("/", usersController.allUsers);
-router.delete('/', usersController.deleteUser);
+router.get("/", usersController.restrictToSuperUser,  usersController.allUsers);
+router.delete('/', usersController.restrictToSuperUser, usersController.deleteUser);
 
 module.exports = router;

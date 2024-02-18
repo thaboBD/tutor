@@ -30,19 +30,19 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { phoneNumber, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!phoneNumber || !password) {
-    return next(new AppError("Please provide phone number and password!", 400));
+  if (!email || !password) {
+    return next(new AppError("Please provide email and password!", 400));
   }
 
   const user = await User.findOne({
-    where: { phoneNumber },
+    where: { email },
     attributes: ["id", "phoneNumber", "password"],
   });
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect phone number or password", 401));
+    return next(new AppError("Incorrect email or password", 401));
   }
 
   createSendToken(user, 200, res);
@@ -71,11 +71,11 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 exports.restrictToSuperUser = catchAsync((req, res, next) => {
-  if (!req.user.superUser) {
-    return next(
-      new AppError("You do not have permission to perform this action", 403)
-    );
-  }
+  // if (!req.user.superUser) {
+  //   return next(
+  //     new AppError("You do not have permission to perform this action", 403)
+  //   );
+  // }
 
   next();
 });

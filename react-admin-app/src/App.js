@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Dashboard from "./Dashboard";
+import Dashboard from "./dashboard";
 import {
   Button,
   TextField,
@@ -9,39 +9,12 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100vh",
-  },
-  container: {
-    maxWidth: 400,
-    padding: theme.spacing(4),
-  },
-  loginForm: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  inputField: {
-    marginBottom: theme.spacing(2),
-  },
-  loginButton: {
-    marginBottom: theme.spacing(2),
-  },
-  errorMessage: {
-    color: theme.palette.error.main,
-    marginBottom: theme.spacing(2),
-  },
-}));
+const LoginApi = `${process.env.REACT_APP_API_URL}/api/v1/users/login`;
 
 function App() {
-  const classes = useStyles();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,12 +22,12 @@ function App() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/login", { username, password });
+      const response = await axios.post(LoginApi, { email, password });
       const { token } = response.data;
       localStorage.setItem("token", token);
       setIsLoggedIn(true);
     } catch (error) {
-      setError("Invalid username or password");
+      setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -66,56 +39,68 @@ function App() {
   };
 
   return (
-    <div className={classes.root}>
-      <Container component="main" maxWidth="sm" className={classes.container}>
-        <Paper elevation={3} className={classes.paper}>
-          {isLoggedIn ? (
-            <div className={classes.dashboardContainer}>
-              <Dashboard />
-              <Button
-                variant="contained"
-                color="secondary"
-                className={classes.logoutButton}
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <div className={classes.loginForm}>
-              <Typography variant="h5" gutterBottom>
-                Login
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <Paper sx={{ padding: "20px", width: 400 }}>
+        {isLoggedIn ? (
+          <div>
+            <Dashboard />
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ mt: 2 }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              Login
+            </Typography>
+            <TextField
+              variant="outlined"
+              label="Email"
+              fullWidth
+              sx={{ mb: 2 }}
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+            />
+            <TextField
+              variant="outlined"
+              type="password"
+              label="Password"
+              fullWidth
+              sx={{ mb: 2 }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mb: 2 }}
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Login"}
+            </Button>
+            {error && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {error}
               </Typography>
-              <TextField
-                className={classes.inputField}
-                variant="outlined"
-                label="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <TextField
-                className={classes.inputField}
-                variant="outlined"
-                type="password"
-                label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Button
-                className={classes.loginButton}
-                variant="contained"
-                color="primary"
-                onClick={handleLogin}
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} /> : "Login"}
-              </Button>
-              {error && <Typography className={classes.errorMessage}>{error}</Typography>}
-            </div>
-          )}
-        </Paper>
-      </Container>
-    </div>
+            )}
+          </div>
+        )}
+      </Paper>
+    </Container>
   );
 }
 
