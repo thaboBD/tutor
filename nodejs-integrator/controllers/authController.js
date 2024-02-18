@@ -2,6 +2,7 @@ const { User } = require("../models");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { createSendToken, decodeJwt } = require("../utils/authUtils");
+const { Op } = require("sequelize");
 
 exports.signup = catchAsync(async (req, res, next) => {
   const {
