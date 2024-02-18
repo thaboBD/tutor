@@ -10,19 +10,24 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Paper,
+  Typography,
+  IconButton,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Alert from "@mui/material/Alert";
 
 const UsersApi = `${process.env.REACT_APP_API_URL}/api/v1/users`;
 
-console.log("******************");
-console.log(UsersApi);
-console.log("******************");
-
 const Dashboard = () => {
-  const [phoneNumber, setphoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [data, setData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [newphoneNumber, setNewphoneNumber] = useState("");
+  const [newPhoneNumber, setNewPhoneNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -31,7 +36,6 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(UsersApi);
-      console.log(response.data);
       setData(response.data.users);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -39,40 +43,44 @@ const Dashboard = () => {
   };
 
   const handleCreate = async () => {
+    setLoading(true);
     try {
-      await axios.post(`${UsersApi}/signup`, { phoneNumber: newphoneNumber });
+      const response = await axios.post(`${UsersApi}/signup`, {
+        phoneNumber: newPhoneNumber,
+      });
       setModalOpen(false);
       fetchData();
+      setNotification({ type: "success", message: "Phone number added successfully" });
     } catch (error) {
       console.error("Error creating data:", error);
+      setNotification({ type: "error", message: "Failed to add phone number" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div class="App">
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Mobile Number</TableCell>
-              {/* Add more table headers if needed */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((item, idx) => (
-              <TableRow key={item._id}>
-                <TableCell>{idx + 1}</TableCell>
-                <TableCell>{item.phoneNumber}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this record?")) {
+      try {
+        await axios.delete(`${UsersApi}`, { data: { id } });
+        fetchData();
+        setNotification({ type: "success", message: "Record deleted successfully" });
+      } catch (error) {
+        console.error("Error deleting data:", error);
+        setNotification({ type: "error", message: "Failed to delete record" });
+      }
+    }
+  };
 
-      <Button variant="contained" onClick={() => setModalOpen(true)}>
-        Add Mobile Number
-      </Button>
+  const handleNotificationClose = () => {
+    setNotification(null);
+  };
+
+  return (
+    <div className="dashboard-container" style={{ padding: "20px" }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Thabo Chatbot Admin Panel
+      </Typography>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <div
@@ -83,18 +91,68 @@ const Dashboard = () => {
             transform: "translate(-50%, -50%)",
             backgroundColor: "white",
             padding: 20,
+            borderRadius: 8,
           }}
         >
+          <Typography variant="h6" gutterBottom>
+            Add Mobile Number
+          </Typography>
           <TextField
             label="Mobile Number"
-            value={newphoneNumber}
-            onChange={(e) => setNewphoneNumber(e.target.value)}
+            value={newPhoneNumber}
+            onChange={(e) => setNewPhoneNumber(e.target.value)}
+            fullWidth
+            margin="normal"
           />
-          <Button variant="contained" onClick={handleCreate}>
-            Create
+          <Button variant="contained" onClick={handleCreate} disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : "Create"}
           </Button>
         </div>
       </Modal>
+
+      <div className="table-container" style={{ margin: "auto", maxWidth: "80%" }}>
+        <Button
+          variant="contained"
+          onClick={() => setModalOpen(true)}
+          style={{ marginBottom: 20 }}
+        >
+          Add Mobile Number
+        </Button>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>Mobile Number</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.map((item, idx) => (
+                <TableRow key={item.id}>
+                  <TableCell>{idx + 1}</TableCell>
+                  <TableCell>{item.phoneNumber}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleDelete(item.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+
+      <Snackbar open={!!notification} autoHideDuration={6000} onClose={handleNotificationClose}>
+        <Alert
+          onClose={handleNotificationClose}
+          severity={notification ? notification.type : "success"}
+          sx={{ width: "100%" }}
+        >
+          {notification && notification.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

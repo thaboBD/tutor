@@ -31,7 +31,6 @@ services:
 
   react-sever:
     build: ./react-admin-app
-    command: sh -c "npm install && npm start"
     volumes:
       - ./react-admin-app:/react-admin-app
     ports:

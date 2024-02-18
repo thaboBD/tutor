@@ -64,9 +64,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     },
   });
 
-  console.log("CURRENT USRER", currentUser)
-  console.log("FROM", req.body.From)
-
   req.user = currentUser;
   res.locals.user = currentUser;
 
