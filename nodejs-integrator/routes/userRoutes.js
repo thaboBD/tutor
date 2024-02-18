@@ -4,11 +4,24 @@ const usersController = require("./../controllers/usersController");
 
 const router = express.Router();
 
-router.post("/signup", authController.signup);
 router.post("/login", authController.login);
-router.get("/logout", authController.logout);
+router.get("/", authController.restrictToSuperUser, usersController.allUsers);
 
-router.get("/", usersController.restrictToSuperUser,  usersController.allUsers);
-router.delete('/', usersController.restrictToSuperUser, usersController.deleteUser);
+router.post(
+  "/signup",
+  authController.restrictToSuperUser,
+  authController.signup
+);
+router.get(
+  "/logout",
+  authController.restrictToSuperUser,
+  authController.logout
+);
+
+router.delete(
+  "/",
+  authController.restrictToSuperUser,
+  usersController.deleteUser
+);
 
 module.exports = router;

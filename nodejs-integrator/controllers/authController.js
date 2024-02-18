@@ -57,7 +57,7 @@ exports.logout = (req, res) => {
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
-  const phone = req.body.From.split(':')[1]
+  const phone = req.body.From.split(":")[1];
   const currentUser = await User.findOne({
     where: {
       phoneNumber: { [Op.like]: `%${phone}` },
@@ -70,12 +70,33 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.restrictToSuperUser = catchAsync((req, res, next) => {
-  // if (!req.user.superUser) {
-  //   return next(
-  //     new AppError("You do not have permission to perform this action", 403)
-  //   );
-  // }
+exports.restrictToSuperUser = catchAsync(async (req, res, next) => {
+  console.log("RESTRICTING");
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access.", 401)
+    );
+  }
 
+  const decoded = await decodeJwt(token);
+
+  const currentUser = await User.findByPk(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        "The user belonging to this token does no longer exist.",
+        401
+      )
+    );
+  }
+
+  req.user = currentUser;
   next();
 });

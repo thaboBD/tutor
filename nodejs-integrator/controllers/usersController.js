@@ -2,6 +2,7 @@ const { User } = require("../models");
 const { sequelize } = require("../models");
 const AppError = require("../utils/appError");
 const catchAsync = require("./../utils/catchAsync");
+const { Op } = require("sequelize");
 
 /* @example
  * // Request
@@ -58,21 +59,29 @@ exports.makeSuperUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteUser = catchAsync(async(req,res,next) => {
-  const user = await User.findByPk(req.body.id)
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  const user = await User.findByPk(req.body.id);
 
-  if(!user)return next(new AppError("User not found", 400))
+  if (!user) return next(new AppError("User not found", 400));
 
-  await user.destroy()
+  await user.destroy();
 
   res.status(200).json({
     status: "deleted",
   });
-})
+});
 
 exports.allUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll({
     attributes: ["id", "phoneNumber"],
+    where: {
+      superUser: {
+        [Op.not]: true,
+      },
+    },
+    order: [
+      ["createdAt", "DESC"], // Order by creation date in ascending order
+    ],
   });
 
   res.status(200).json({
