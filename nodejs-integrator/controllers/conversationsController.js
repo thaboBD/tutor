@@ -11,12 +11,12 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   const mediaUrl = body[`MediaUrl${0}`];
   const response = new MessagingResponse();
 
-  console.log("CURENT USER", req.user)
-
   if (!req.user) {
-    (message =
-      "This phone number is not registered for conversation, please get yourself registered first. Thanks"),
-      (message, senderNumber);
+    message =
+      "This phone number is not registered for conversation, please get yourself registered first. Thanks"
+
+    sendTwilioResponse(message, senderNumber);
+    return res.send(response.toString()).status(200);
   }
 
   // will upload to s3 if required
