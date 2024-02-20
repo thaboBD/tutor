@@ -15,6 +15,7 @@ import requests
 from pprint import pprint
 import aiohttp
 import asyncio
+import urllib.parse
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -42,11 +43,11 @@ def home():
 @app.post("/webhook", response_model=FulfillmentResponse)
 async def webhook(info : Request):
     print("WHEBHOOK CALLED")
-    intent, query, context_number, imageUrl = await extract_data_from_request(info)
-    result = await decide_intent_find_result(intent, query, imageUrl)
+    intent, query, context_number, image_url = await extract_data_from_request(info)
+    result = await decide_intent_find_result(intent, query, image_url)
     response = FulfillmentResponse(fulfillmentText=result)
 
-    print("IMAGe URL", imageUrl)
+    print("IMAGe URL", image_url)
     print("Inent", intent)
 
     if result and context_number:
@@ -115,10 +116,11 @@ async def extract_data_from_request(info):
         output_contexts = query_result.get("outputContexts", [])
         output_context = output_contexts[0]["name"] if output_contexts else None
 
+
         intent = query_result.get("intent", {}).get("displayName", None)
         query = query_result.get("queryText", None)
         context_number = None
-        imageUrl = None
+        image_url = None
 
         '''
             'specialidentifier' in outputContext is
@@ -126,16 +128,22 @@ async def extract_data_from_request(info):
                 false when the endpoint is hit through dialog-flow
         '''
         if 'specialidentifier' in output_context:
-            data = output_context.split('/')[-1].split('-')
-            if len(data) == 3:
-                context_number, imageUrl = data[1], data[2]
+            print(":**************")
+            print(output_context)
+            print(output_context.split('/')[-1].split('<[]()[]>'))
+            print(":**************")
+            data = output_context.split('/')[-1].split('<[]()[]>')
+            if len(data) >= 3:
+                context_number = data[1]
+                encoded_image = data[2]
+                image_url = fetch_image(encoded_image)
 
-        return intent, query, context_number, imageUrl
+        return intent, query, context_number, image_url
     except Exception as e:
         print("Exception occurred while extracting data from request:", e)
         return None, None, None, None
 
-async def decide_intent_find_result(intent, query, imageUrl):
+async def decide_intent_find_result(intent, query, image_url):
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
@@ -146,7 +154,7 @@ async def decide_intent_find_result(intent, query, imageUrl):
         print("IMAGE INTENT")
         return 123
     else:
-        return 'None'
+        return ''
 
 async def send_webhook_request(result, context_number):
         webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
@@ -155,3 +163,18 @@ async def send_webhook_request(result, context_number):
         async with aiohttp.ClientSession() as session:
             async with session.post(webhook_url, data=data) as response:
                 return await response.text()
+
+def fetch_image(encoded_image):
+    decoded_image_url = urllib.parse.unquote(encoded_image)
+
+    twilio_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+
+    print(twilio_sid, twilio_auth_token)
+    auth = (twilio_sid, twilio_auth_token)
+
+    res = requests.get(decoded_image_url, auth=auth)
+    print("******")
+    print(decoded_image_url)
+    print(res)
+    print("******")
