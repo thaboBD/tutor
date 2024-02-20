@@ -12,7 +12,7 @@ services:
     depends_on:
       - postgresdb
     env_file:
-      - ../secrects/node-env
+      - ../secrets/node-env
     environment:
       - DB_HOST=postgresdb
 
@@ -26,7 +26,7 @@ services:
     networks:
       - app-network
     env_file:
-      - ../secrects/fast-env
+      - ../secrets/fast-env
 
   react-server:
     build: ./react-admin-app
@@ -37,7 +37,7 @@ services:
     networks:
       - app-network
     env_file:
-      - ../secrects/react-env
+      - ../secrets/react-env
 
   postgresdb:
     image: postgres:15-alpine
@@ -45,7 +45,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-    env_file: ../secrects/node-env
+    env_file: ../secrets/node-env
     networks:
       - app-network
     healthcheck:
