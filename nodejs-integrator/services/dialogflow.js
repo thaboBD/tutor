@@ -34,7 +34,7 @@ exports.requestDialogFlow = catchAsync(
       queryParams: {
         contexts: [
           {
-            name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier-${phoneNumber}-${encodedString}`,
+            name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier<[]()[]>${phoneNumber}<[]()[]>${encodedString}`,
             lifespanCount: 5,
           },
         ],
