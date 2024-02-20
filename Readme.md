@@ -28,11 +28,12 @@ We have three sub-repos, each focusing on its dedicated work:
 3. Create a PR and merge it into `chatbot-integration` after approval from `thabodube`.
 4. Build Docker containers:
    ```bash
-   docker-compose build
+   docker-compose -f docker-compose-local.yml build
    ```
 5. Start all servers locally:
    ```bash
-   docker-compose up
+   docker-compose -f docker-compose-local.yml up
+
    ```
 
 ### Deployment Process
@@ -47,7 +48,7 @@ We have three sub-repos, each focusing on its dedicated work:
    ```
 3. Stop existing Docker containers:
    ```bash
-   sudo docker-compose kill
+   sudo docker-compose -f docker-compose-prod.yml kill
    ```
 4. Pull the latest changes from the `chatbot-integration` branch:
    ```bash
@@ -55,12 +56,12 @@ We have three sub-repos, each focusing on its dedicated work:
    ```
 5. Build Docker containers for the updated services:
    ```bash
-   sudo docker-compose build <service-name>
+   sudo docker-compose -f docker-compose-prod.yml build <service-name>
    ```
-   (See `docker-compose.yml` for service names)
+   (See `docker-compose-prod.yml` for service names)
 6. Run the updated containers in detached mode:
    ```bash
-   sudo docker-compose run -d
+   sudo docker-compose -f docker-compose-prod.yml up -d
    ```
 
 ## Accessing the Web on the Server
@@ -73,4 +74,10 @@ We have three sub-repos, each focusing on its dedicated work:
   ```
 
 ### Managing Secrets
-All secrets are stored inside LastPass. Set them in related environments and get going. Every subproject has its own `.env` file.
+
+**Local Environment:**
+- For local secrets, set them in the related environments and get going. Each subproject has its own `.env` file for managing its specific configuration.
+
+**Production Environment:**
+- All secrets are stored inside the `secrets/` directory at the root following their names. Make any necessary changes inside them as needed for the production environment.
+
