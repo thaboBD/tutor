@@ -3,11 +3,10 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
 const client = require("twilio")(accountSid, authToken);
 const catchAsync = require("../utils/catchAsync");
+const axios = require("axios");
 
-module.exports = catchAsync(async (message, responseNumber) => {
+exports.sendTwilioResponse = catchAsync(async (message, responseNumber) => {
   console.log("*********TWILIO*********");
-  console.log("responseNumber ", responseNumber);
-  console.log("message ", message);
 
   if (!message) return;
 
@@ -37,4 +36,23 @@ module.exports = catchAsync(async (message, responseNumber) => {
   }
 
   await attemptSend(maxRetries);
+});
+
+exports.imageS3Path = catchAsync(async (url) => {
+  const auth = {
+    username: accountSid,
+    password: authToken,
+  };
+
+  axios
+    .get(url, { auth })
+    .then((response) => {
+      console.log("Response:", response.data);
+    })
+    .catch((error) => {
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
+    });
 });

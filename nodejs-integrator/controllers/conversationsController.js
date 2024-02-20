@@ -3,7 +3,7 @@ const { uploadFile } = require("../services/s3");
 
 const catchAsync = require("../utils/catchAsync");
 const { MessagingResponse } = require("twilio").twiml;
-const sendTwilioResponse = require("../services/twilio");
+const twilio = require("../services/twilio");
 
 exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   const { body } = req;
@@ -11,13 +11,13 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   const mediaUrl = body[`MediaUrl${0}`];
   const response = new MessagingResponse();
 
-  console.log("USER ID: ",!req.user)
+  console.log("USER ID: ", !req.user);
 
   if (!req.user) {
     message =
-      "This phone number is not registered for conversation, please get yourself registered first. Thanks"
+      "This phone number is not registered for conversation, please get yourself registered first. Thanks";
 
-    sendTwilioResponse(message, senderNumber);
+    twilio.sendTwilioResponse(message, senderNumber);
     return res.send(response.toString()).status(200);
   }
 
@@ -27,7 +27,7 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
 
   const result = requestDialogFlow(senderNumber, query, mediaUrl);
 
-  if (result) sendTwilioResponse(result, senderNumber);
+  if (result) twilio.sendTwilioResponse(result, senderNumber);
 
   return res.send(response.toString()).status(200);
 });
@@ -39,7 +39,7 @@ exports.fastApiResponseHook = catchAsync(async (req, res, next) => {
     ? senderNumber
     : `whatsapp${senderNumber}`;
 
-  if (result) sendTwilioResponse(result, phoneNumber);
+  if (result) twilio.sendTwilioResponse(result, phoneNumber);
 
   res.type("text/xml").send("success");
 });

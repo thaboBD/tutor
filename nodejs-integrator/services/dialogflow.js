@@ -3,10 +3,11 @@ const sessionId = uuid.v4();
 const dialogflow = require("@google-cloud/dialogflow");
 
 const catchAsync = require("../utils/catchAsync");
-const sendTwilioResponse = require("./twilio");
+const twilio = require("./twilio");
 
 const projectId = process.env.DIALOGFLOW_PROJECTID;
 const keyFilePath = process.env.DIALOGFLOW_CREDENTIALS_PATH;
+
 exports.requestDialogFlow = catchAsync(
   async (phoneNumber, query, mediaUrl, callback) => {
     const sessionClient = new dialogflow.SessionsClient({
@@ -18,6 +19,7 @@ exports.requestDialogFlow = catchAsync(
       sessionId
     );
 
+    const imageS3Path = twilio.imageS3Path(mediaUrl);
     const encodedString = encodeURIComponent(mediaUrl);
 
     console.log("MEDIA URL", encodedString);
@@ -44,6 +46,6 @@ exports.requestDialogFlow = catchAsync(
     const responses = await sessionClient.detectIntent(request);
     const result = responses[0].queryResult.fulfillmentText;
 
-    sendTwilioResponse(result, phoneNumber);
+    twilio.sendTwilioResponse(result, phoneNumber);
   }
 );
