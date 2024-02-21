@@ -63,6 +63,7 @@ function App() {
                   fullWidth
                   sx={{ mb: 2 }}
                   value={email}
+                  required
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <TextField
@@ -70,6 +71,7 @@ function App() {
                   type="password"
                   label="Password"
                   fullWidth
+                  required
                   sx={{ mb: 2 }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
