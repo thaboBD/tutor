@@ -113,7 +113,7 @@ async def upload_image(file: UploadFile = File(...)):
 
 async def extract_data_from_request(info):
     try:
-        redis = await aioredis.create_redis_pool("redis://redis")
+        redis = await aioredis.Redis.from_url("redis://redis")
         json_request = await info.json()
         query_result = json_request.get("queryResult", {})
         output_contexts = query_result.get("outputContexts", [])
