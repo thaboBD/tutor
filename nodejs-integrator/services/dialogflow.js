@@ -26,6 +26,10 @@ exports.requestDialogFlow = catchAsync(
       sessionId
     );
 
+    if(mediaUrl){
+      message = "Sit tight! We are analyzing your picture and we will send you a message with the result.";
+      twilio.sendTwilioResponse(message, phoneNumber);
+    }
     twilio
       .imageS3Path(mediaUrl)
       .then((imageS3Path) => {
