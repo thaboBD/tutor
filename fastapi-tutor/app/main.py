@@ -140,7 +140,7 @@ async def extract_data_from_request(info):
                 await redis.delete(context_number)
 
             print(":**************")
-            print(image_url)
+            print("redis-image",image_url)
             print(":**************")
 
         return intent, query, context_number, image_url
@@ -149,6 +149,7 @@ async def extract_data_from_request(info):
         return None, None, None, None
 
 async def decide_intent_find_result(intent, query, image_url):
+    print("INENT: ",intent)
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
@@ -156,8 +157,7 @@ async def decide_intent_find_result(intent, query, image_url):
     elif intent == 'search-topic':
         return await calculate(QueryModel(query=query))
     elif intent == 'image':
-        print("IMAGE INTENT")
-        return 123
+        return await readImage(image_url)
     else:
         return ''
 

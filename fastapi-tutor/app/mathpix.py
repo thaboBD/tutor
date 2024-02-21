@@ -13,12 +13,13 @@ api_url = "https://api.mathpix.com/v3/latex"
 
 
 def readImage(imageURI):
-    # Encode the image in base64 format
-    with open(imageURI, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode()
+    print("READING IMAGE", imageURI)
+    # # Encode the image in base64 format
+    # with open(imageURI, "rb") as image_file:
+    #     encoded_string = base64.b64encode(image_file.read()).decode()
 
     data = {
-        "src": "data:image/jpg;base64," + encoded_string,
+        "src": imageURI,
         "formats": ["text", "latex_simplified", "asciimath"],
         "ocr": ["math", "text"],
         "text": {
