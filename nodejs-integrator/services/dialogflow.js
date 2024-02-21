@@ -50,7 +50,7 @@ exports.requestDialogFlow = catchAsync(
             .detectIntent(request)
             .then((responses) => {
               const result = responses[0].queryResult.fulfillmentText;
-              twilio.sendTwilioResponse(result, phoneNumber);
+              twilio.sendTwilioResponse(result, phoneNumber, query);
             })
             .catch((error) => {
               console.error("Error detecting intent:", error);

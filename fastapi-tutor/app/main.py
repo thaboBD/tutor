@@ -53,7 +53,7 @@ async def webhook(info : Request):
     response = FulfillmentResponse(fulfillmentText=result)
 
     if result and context_number:
-        await send_webhook_request(result, context_number)
+        await send_webhook_request(result, context_number, query)
 
     return response
 
@@ -166,17 +166,10 @@ async def decide_intent_find_result(intent, query, image_url):
     else:
         return ''
 
-async def send_webhook_request(result, context_number):
+async def send_webhook_request(result, context_number, query):
         webhook_url = NODE_JS_WEBHOOK_URL
 
-        data = {'result': result, 'From': context_number}
+        data = {'result': result, 'From': context_number, 'query': query}
         async with aiohttp.ClientSession() as session:
             async with session.post(webhook_url, data=data) as response:
                 return await response.text()
-
-def fetch_image(encoded_image):
-    res = requests.get(decoded_image_url, auth=auth)
-    print("******")
-    print(decoded_image_url)
-    print(res)
-    print("******")

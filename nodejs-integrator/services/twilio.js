@@ -9,10 +9,10 @@ const util = require("util");
 const redis = require("./redis");
 const getAsync = util.promisify(redis.get).bind(redis);
 
-exports.sendTwilioResponse = catchAsync(async (message, responseNumber) => {
+exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) => {
   console.log("*********TWILIO*********");
 
-  const uniqueKey = `${message}:${responseNumber}`;
+  const uniqueKey = `${query}:${responseNumber}`;
 
    // donot send reponse if already sent, expires after 5 seconds
   const isAlreadySent = await getAsync(uniqueKey);
