@@ -3,6 +3,7 @@ import json
 import os
 from dotenv import load_dotenv
 import base64
+import re
 
 load_dotenv()
 
@@ -12,10 +13,11 @@ app_key = os.getenv('MATHPIX_API_KEY')
 api_url = "https://api.mathpix.com/v3/latex"
 
 
-def readImage(imageURI):
+def readImage(imageURL):
+    imageURI = extract_quoted_substring(imageURL)
     print("READING IMAGE", imageURI)
     # # Encode the image in base64 format
-    # with open(imageURI, "rb") as image_file:
+    # with open(imageURL, "rb") as image_file:
     #     encoded_string = base64.b64encode(image_file.read()).decode()
 
     data = {
@@ -37,7 +39,12 @@ def readImage(imageURI):
     response = response.json()
     return response['asciimath']
 
+def extract_quoted_substring(string):
+    pattern = r"b?'(.*?)'"
 
-# Example usage:
-# result = readImage("images/algebra.png")
-# print(result)
+    match = re.search(pattern, string)
+    if match:
+        return match.group(1)
+    else:
+        return string
+

@@ -158,7 +158,7 @@ async def decide_intent_find_result(intent, query, image_url):
         return await exercises(QueryModel(query=query))
     elif intent == 'search-topic':
         return await calculate(QueryModel(query=query))
-    elif intent == 'read-image':
+    elif intent == 'read-image' and image_url:
         return await readImage(image_url)
     else:
         return ''
