@@ -37,5 +37,7 @@ def readImage(imageURL):
 
     response = requests.post(api_url, headers=headers, data=json.dumps(data))
     response = response.json()
-    print("MATH PIX Reponse",response)
-    return response['asciimath']
+    if 'error' in response:
+        return response['error']
+    else:
+        return response['text']
