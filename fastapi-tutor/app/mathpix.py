@@ -37,6 +37,7 @@ def readImage(imageURL):
 
     response = requests.post(api_url, headers=headers, data=json.dumps(data))
     response = response.json()
+    print("MATH PIX Reponse",response)
     return response['asciimath']
 
 def extract_quoted_substring(string):
