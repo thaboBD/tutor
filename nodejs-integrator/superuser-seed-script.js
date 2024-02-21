@@ -9,9 +9,9 @@ const seedSuperUser = catchAsync(async () => {
     await User.create({
       firstName: "thabo",
       lastName: "dube",
-      email: "thabodube@chatbot.com",
-      password: "!thabodube?",
-      phoneNumber: "+13203628618",
+      email: null,
+      password: null,
+      phoneNumber: null,
       superUser: true,
     });
 

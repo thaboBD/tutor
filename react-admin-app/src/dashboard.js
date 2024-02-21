@@ -36,18 +36,14 @@ const Dashboard = ({setIsLoggedIn}) => {
 
   const fetchData = async () => {
     try {
-      console.log("USERS API", UsersApi)
-      console.log("AUTH TOKEN", authToken)
       const response = await axios.get(UsersApi, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "ngrok-skip-browser-warning": "69420"
         }
       });
-      console.log(response)
       // if (!response.data.users) throw Error;
       let users = response.data.users || [];
-      console.log("RESPONSE USERS", users)
       setData(users);
     } catch (error) {
       console.error("Error fetching data:", error);

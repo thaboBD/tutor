@@ -13,7 +13,6 @@ import {
 const UsersApi = `${process.env.REACT_APP_API_URL}/api/v1/users/login`;
 const authToken = localStorage.getItem("token");
 
-console.log("USERS API", process.env)
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!authToken);
   const [email, setEmail] = useState("");
@@ -27,7 +26,6 @@ function App() {
     try {
       const response = await axios.post(UsersApi, { email, password });
       const { token } = response.data;
-      console.log("MY TOKEN: ", token);
       localStorage.setItem("token", token);
       setIsLoggedIn(true);
     } catch (error) {
