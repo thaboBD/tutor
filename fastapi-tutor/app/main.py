@@ -139,19 +139,12 @@ async def extract_data_from_request(info):
             if image_url:
                 await redis.delete(context_number)
 
-            print(":**************")
-            print("redis-image",image_url)
-            print(":**************")
-
         return intent, query, context_number, image_url
     except Exception as e:
         print("Exception occurred while extracting data from request:", e)
         return None, None, None, None
 
 async def decide_intent_find_result(intent, query, image_url):
-    print("INENT: ",intent)
-    print("IMGAE URI: ", image_url)
-
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
@@ -160,9 +153,8 @@ async def decide_intent_find_result(intent, query, image_url):
         return await calculate(QueryModel(query=query))
     elif intent == 'read-image' and image_url:
         image_data = readImage(image_url)
-        print(image_data)
-        image_str = str(image_data)
-        return image_str
+        query = str(image_data)
+        return await calculate(QueryModel(query=query))
     else:
         return ''
 
