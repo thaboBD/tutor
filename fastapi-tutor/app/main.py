@@ -150,13 +150,15 @@ async def extract_data_from_request(info):
 
 async def decide_intent_find_result(intent, query, image_url):
     print("INENT: ",intent)
+    print("IMGAE URI: ", image_url)
+
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
         return await exercises(QueryModel(query=query))
     elif intent == 'search-topic':
         return await calculate(QueryModel(query=query))
-    elif intent == 'image':
+    elif intent == 'read-image':
         return await readImage(image_url)
     else:
         return ''
