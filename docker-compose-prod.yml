@@ -45,7 +45,7 @@ services:
     networks:
       - app-network
     env_file:
-      - ../secrets/react-env
+      - ./react-admin-app/.env
 
   postgresdb:
     image: postgres:15-alpine
