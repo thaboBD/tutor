@@ -14,7 +14,7 @@ api_url = "https://api.mathpix.com/v3/latex"
 
 
 def readImage(imageURL):
-    imageURI = extract_quoted_substring(imageURL)
+    imageURI = imageURL.decode("utf-8")
     print("READING IMAGE", imageURI)
     # # Encode the image in base64 format
     # with open(imageURL, "rb") as image_file:
@@ -39,13 +39,3 @@ def readImage(imageURL):
     response = response.json()
     print("MATH PIX Reponse",response)
     return response['asciimath']
-
-def extract_quoted_substring(string):
-    pattern = r"b?'(.*?)'"
-
-    match = re.search(pattern, string)
-    if match:
-        return match.group(1)
-    else:
-        return string
-
