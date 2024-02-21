@@ -40,4 +40,4 @@ def readImage(imageURL):
     if 'error' in response:
         return response['error']
     else:
-        return response['text']
+        return response['asciimath']
