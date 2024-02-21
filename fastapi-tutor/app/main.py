@@ -16,6 +16,11 @@ from pprint import pprint
 import aiohttp
 import asyncio
 import urllib.parse
+import aioredis
+
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+NODE_JS_WEBHOOK_URL = os.getenv('NODE_JS_WEBHOOK_URL')
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -46,9 +51,6 @@ async def webhook(info : Request):
     intent, query, context_number, image_url = await extract_data_from_request(info)
     result = await decide_intent_find_result(intent, query, image_url)
     response = FulfillmentResponse(fulfillmentText=result)
-
-    print("IMAGe URL", image_url)
-    print("Inent", intent)
 
     if result and context_number:
         await send_webhook_request(result, context_number)
@@ -111,6 +113,7 @@ async def upload_image(file: UploadFile = File(...)):
 
 async def extract_data_from_request(info):
     try:
+        redis = await aioredis.create_redis_pool("redis://redis")
         json_request = await info.json()
         query_result = json_request.get("queryResult", {})
         output_contexts = query_result.get("outputContexts", [])
@@ -128,15 +131,17 @@ async def extract_data_from_request(info):
                 false when the endpoint is hit through dialog-flow
         '''
         if 'specialidentifier' in output_context:
-            print(":**************")
-            print(output_context)
-            print(output_context.split('/')[-1].split('<[]()[]>'))
-            print(":**************")
             data = output_context.split('/')[-1].split('<[]()[]>')
-            if len(data) >= 3:
+            if len(data) >= 2:
                 context_number = data[1]
-                encoded_image = data[2]
-                image_url = fetch_image(encoded_image)
+
+            image_url = await redis.get(context_number)
+            if image_url:
+                await redis.delete(context_number)
+
+            print(":**************")
+            print(image_url)
+            print(":**************")
 
         return intent, query, context_number, image_url
     except Exception as e:
@@ -157,7 +162,7 @@ async def decide_intent_find_result(intent, query, image_url):
         return ''
 
 async def send_webhook_request(result, context_number):
-        webhook_url = os.getenv('NODE_JS_WEBHOOK_URL')
+        webhook_url = NODE_JS_WEBHOOK_URL
 
         data = {'result': result, 'From': context_number}
         async with aiohttp.ClientSession() as session:
@@ -165,14 +170,6 @@ async def send_webhook_request(result, context_number):
                 return await response.text()
 
 def fetch_image(encoded_image):
-    decoded_image_url = urllib.parse.unquote(encoded_image)
-
-    twilio_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-
-    print(twilio_sid, twilio_auth_token)
-    auth = (twilio_sid, twilio_auth_token)
-
     res = requests.get(decoded_image_url, auth=auth)
     print("******")
     print(decoded_image_url)
