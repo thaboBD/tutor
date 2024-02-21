@@ -12,7 +12,7 @@ const { struct } = require("pb-util");
 const redis = require("./redis");
 
 exports.requestDialogFlow = catchAsync(
-  async (phoneNumber, query, mediaUrl, callback) => {
+  async (phoneNumber, query, mediaUrl, startTime) => {
     const sessionClient = new dialogflow.SessionsClient({
       keyFilename: keyFilePath,
     });
@@ -22,15 +22,11 @@ exports.requestDialogFlow = catchAsync(
       sessionId
     );
 
-    if(mediaUrl){
-      message = "Sit tight! We are analyzing your picture and we will send you a message with the result.";
-      twilio.sendTwilioResponse(message, phoneNumber);
-    }
     twilio
       .imageS3Path(mediaUrl)
       .then((imageS3Path) => {
         if (imageS3Path) {
-          redis.set(phoneNumber, imageS3Path);
+          if(mediaUrl) redis.set(phoneNumber, imageS3Path);
 
           const request = {
             session: sessionPath,
@@ -41,10 +37,6 @@ exports.requestDialogFlow = catchAsync(
               },
             },
             queryParams: {
-              event: {
-                name: "image-event",
-                parameters: struct.encode({ name: imageS3Path }),
-              },
               contexts: [
                 {
                   name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier<[]()[]>${phoneNumber}`,

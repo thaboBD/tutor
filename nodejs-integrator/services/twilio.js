@@ -52,6 +52,8 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber) => {
 });
 
 exports.imageS3Path = async (url) => {
+  if(!url) return Promise.resolve('no-image-attached');
+
   const auth = {
     username: accountSid,
     password: authToken,
