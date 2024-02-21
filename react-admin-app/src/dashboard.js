@@ -51,7 +51,7 @@ const Dashboard = ({setIsLoggedIn}) => {
       setData(users);
     } catch (error) {
       console.error("Error fetching data:", error);
-      localStorage.removeItem("token");
+      // localStorage.removeItem("token");
       setNotification({ type: "error", message: "Failed to fetch data" });
     }
   };
