@@ -87,6 +87,8 @@ exports.restrictToSuperUser = catchAsync(async (req, res, next) => {
 
   const decoded = await decodeJwt(token);
 
+  console.log("TOKENER", token)
+  console.log("DECODED", decoded)
   const currentUser = await User.findByPk(decoded.id);
   if (!currentUser) {
     return next(

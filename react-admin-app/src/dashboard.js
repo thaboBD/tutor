@@ -37,6 +37,7 @@ const Dashboard = ({setIsLoggedIn}) => {
   const fetchData = async () => {
     try {
       console.log("USERS API", UsersApi)
+      console.log("AUTH TOKEN", authToken)
       const response = await axios.get(UsersApi, {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -47,9 +48,10 @@ const Dashboard = ({setIsLoggedIn}) => {
       // if (!response.data.users) throw Error;
       let users = response.data.users || [];
       console.log("RESPONSE USERS", users)
-      setData(response.data.users);
+      setData(users);
     } catch (error) {
       console.error("Error fetching data:", error);
+      localStorage.removeItem("token");
       setNotification({ type: "error", message: "Failed to fetch data" });
     }
   };

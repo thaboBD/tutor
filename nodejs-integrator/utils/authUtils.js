@@ -23,6 +23,7 @@ exports.createSendToken = (user, statusCode, res) => {
 
   res.cookie("jwt", token, cookieOptions);
 
+  console.log("TOKEN", token)
   res.status(statusCode).json({
     status: "success",
     token,
