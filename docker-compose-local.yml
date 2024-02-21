@@ -9,11 +9,14 @@ services:
       - 3000:3000
     networks:
       - app-network
-    depends_on:
-      - postgresdb
     env_file:
       - ./nodejs-integrator/.env
+    depends_on:
+      - postgresdb
+      - redis
     environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - DB_HOST=postgresdb
 
   fastapi-server:
@@ -27,6 +30,11 @@ services:
       - app-network
     env_file:
       - ./fastapi-tutor/.env
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   react-server:
     build: ./react-admin-app
@@ -54,8 +62,18 @@ services:
       timeout: 5s
       retries: 3
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   app-network:

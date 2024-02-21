@@ -9,11 +9,11 @@ services:
       - 3000:3000
     networks:
       - app-network
+    env_file:
+      - ../secrets/node-env
     depends_on:
       - postgresdb
       - redis
-    env_file:
-      - ../secrets/node-env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -28,10 +28,10 @@ services:
       - 8000:8000
     networks:
       - app-network
-    depends_on:
-      - redis
     env_file:
       - ../secrets/fast-env
+    depends_on:
+      - redis
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -73,6 +73,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   app-network:
