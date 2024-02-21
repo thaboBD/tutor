@@ -7,6 +7,13 @@ const twilio = require("./twilio");
 
 const projectId = process.env.DIALOGFLOW_PROJECTID;
 const keyFilePath = process.env.DIALOGFLOW_CREDENTIALS_PATH;
+const { struct } = require("pb-util");
+
+const Redis = require("ioredis");
+const redis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+});
 
 exports.requestDialogFlow = catchAsync(
   async (phoneNumber, query, mediaUrl, callback) => {
@@ -19,33 +26,49 @@ exports.requestDialogFlow = catchAsync(
       sessionId
     );
 
-    const imageS3Path = twilio.imageS3Path(mediaUrl);
-    const encodedString = encodeURIComponent(mediaUrl);
+    twilio
+      .imageS3Path(mediaUrl)
+      .then((imageS3Path) => {
+        if (imageS3Path) {
+          redis.set(phoneNumber, imageS3Path);
 
-    console.log("MEDIA URL", encodedString);
-    console.log(query);
+          const request = {
+            session: sessionPath,
+            queryInput: {
+              text: {
+                text: query,
+                languageCode: "en-US",
+              },
+            },
+            queryParams: {
+              event: {
+                name: "image-event",
+                parameters: struct.encode({ name: imageS3Path }),
+              },
+              contexts: [
+                {
+                  name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier<[]()[]>${phoneNumber}`,
+                  lifespanCount: 5,
+                },
+              ],
+            },
+          };
 
-    const request = {
-      session: sessionPath,
-      queryInput: {
-        text: {
-          text: query,
-          languageCode: "en-US",
-        },
-      },
-      queryParams: {
-        contexts: [
-          {
-            name: `projects/${projectId}/agent/sessions/thabochatbot/contexts/specialidentifier<[]()[]>${phoneNumber}<[]()[]>${encodedString}`,
-            lifespanCount: 5,
-          },
-        ],
-      },
-    };
-
-    const responses = await sessionClient.detectIntent(request);
-    const result = responses[0].queryResult.fulfillmentText;
-
-    twilio.sendTwilioResponse(result, phoneNumber);
+          sessionClient
+            .detectIntent(request)
+            .then((responses) => {
+              const result = responses[0].queryResult.fulfillmentText;
+              twilio.sendTwilioResponse(result, phoneNumber);
+            })
+            .catch((error) => {
+              console.error("Error detecting intent:", error);
+            });
+        } else {
+          console.log("S3 image path not found");
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting S3 image path:", error);
+      });
   }
 );

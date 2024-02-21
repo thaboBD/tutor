@@ -38,21 +38,22 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber) => {
   await attemptSend(maxRetries);
 });
 
-exports.imageS3Path = catchAsync(async (url) => {
+exports.imageS3Path = async (url) => {
   const auth = {
     username: accountSid,
     password: authToken,
   };
 
-  axios
-    .get(url, { auth })
-    .then((response) => {
-      console.log("Response:", response.data);
-    })
-    .catch((error) => {
-      console.error(
-        "Error:",
-        error.response ? error.response.data : error.message
-      );
-    });
-});
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url, { auth })
+      .then((response) => {
+        console.log(response.request.res.responseUrl);
+        resolve(response.request.res.responseUrl);
+      })
+      .catch((error) => {
+        console.error("Error fetching image from S3:", error);
+        reject(error);
+      });
+  });
+};
