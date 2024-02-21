@@ -19,7 +19,7 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
   console.log("IS ALREADY", uniqueKey, isAlreadySent);
   if(isAlreadySent) return;
 
-  redis.set(uniqueKey, message , "EX", 5);
+  redis.set(uniqueKey, true , "EX", 5);
 
   if (!message) return;
 
