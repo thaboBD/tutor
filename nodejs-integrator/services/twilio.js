@@ -18,11 +18,9 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
   const isAlreadySent = await getAsync(uniqueKey);
   console.log("IS ALREADY", uniqueKey, isAlreadySent);
   if(isAlreadySent) return;
-
-  redis.set(uniqueKey, true , "EX", 5);
-
   if (!message) return;
 
+  redis.set(uniqueKey, true , "EX", 5);
   const maxRetries = 3;
   let retryDelay = 1000;
 
