@@ -5,8 +5,18 @@ const client = require("twilio")(accountSid, authToken);
 const catchAsync = require("../utils/catchAsync");
 const axios = require("axios");
 
+const redis = require("./redis");
+
 exports.sendTwilioResponse = catchAsync(async (message, responseNumber) => {
   console.log("*********TWILIO*********");
+
+  const uniqueKey = `${message}:${responseNumber}`;
+
+   // donot send reponse if already sent, expires after 5 seconds
+  isAlreadySent = redis.get(uniqueKey);
+  if(isAlreadySent) return;
+
+  redis.set(uniqueKey, true , "EX", 5);
 
   if (!message) return;
 
