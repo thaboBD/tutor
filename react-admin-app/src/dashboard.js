@@ -45,7 +45,8 @@ const Dashboard = ({setIsLoggedIn}) => {
       });
       console.log(response)
       // if (!response.data.users) throw Error;
-
+      let users = response.data.users || [];
+      console.log("RESPONSE USERS", users)
       setData(response.data.users);
     } catch (error) {
       console.error("Error fetching data:", error);
