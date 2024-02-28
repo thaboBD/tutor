@@ -1,0 +1,38 @@
+2024-02-13 14:42:22,795 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:77> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 79, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-13 14:44:00,379 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:77> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 79, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-13 14:46:06,391 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-8' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:77> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 79, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-13 14:49:32,942 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:81> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 83, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-13 14:59:03,663 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:81> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 83, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-13 15:00:44,876 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<send_webhook_request() done, defined at /Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py:81> exception=TypeError("object Response can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/Users/mac/Documents/repos/tutor/fastapi-tutor/app/main.py", line 83, in send_webhook_request
+    await requests.post(webhook_url, data=data)
+TypeError: object Response can't be used in 'await' expression
+2024-02-20 16:10:44,439 - openai - INFO - error_code=invalid_api_key error_message='Incorrect API key provided: #. You can find your API key at https://platform.openai.com/account/api-keys.' error_param=None error_type=invalid_request_error message='OpenAI API error received' stream_error=False
+2024-02-20 16:10:45,354 - openai - INFO - error_code=invalid_api_key error_message='Incorrect API key provided: #. You can find your API key at https://platform.openai.com/account/api-keys.' error_param=None error_type=invalid_request_error message='OpenAI API error received' stream_error=False
