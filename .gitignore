@@ -1,12 +1,14 @@
-.vscode
-.env
-__pycache__
-venv
-private_key.json
+.vscode/
+.env/
+__pycache__/
+venv/
+private_key.json/
 #exclude from git uploads folder
-uploads
-test.py
-.jpeg
-images
-data
-app.log
+uploads/
+test.py/
+.jpeg/
+images/
+data/
+app.log/
+node_modules/
+dialogflow-credentials.json/
