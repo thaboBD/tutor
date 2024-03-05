@@ -16,6 +16,7 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
   // donot send reponse if already sent, expires after 5 seconds
   const uniqueKey = `${query}:${responseNumber}`;
   const isAlreadySent = await getAsync(uniqueKey);
+
   if(isAlreadySent){
     return;
   }else{
@@ -28,11 +29,11 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
   }
 
   maxRetries=3
-  await attemptSend(maxRetries);
+  await attemptSend(maxRetries, message, responseNumber);
 });
 
 
-const attemptSend = async (retriesLeft) => {
+const attemptSend = async (retriesLeft, message, responseNumber) => {
   let retryDelay = 1000;
     try {
       await client.messages.create({
