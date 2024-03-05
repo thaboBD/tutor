@@ -138,6 +138,7 @@ async def extract_data_from_request(info):
         return None, None, None, None
 
 async def decide_intent_find_result(intent, query, image_url):
+    print("INTENT", intent, query, image_url)
     if intent == 'calculate':
         return await calculate(QueryModel(query=query))
     elif intent == 'exercises':
