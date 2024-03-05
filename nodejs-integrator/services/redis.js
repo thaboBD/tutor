@@ -13,12 +13,13 @@ const setupFastApiListerners = async () => {
   redis.on("message", function(channel, data) {
     let { result, From, query } = data;
 
-    let phoneNumber = From.includes("whatsapp")
-    ? senderNumber
-    : `whatsapp${senderNumber}`;
+    console.log(`Received message from channel ${channel}: ${data}`);
+
+    let phoneNumber = From?.includes("whatsapp")
+      ? senderNumber
+      : `whatsapp${senderNumber}`;
 
     twilio.sendTwilioResponse(result, phoneNumber, query);
-    console.log(`Received message from channel ${channel}: ${data}`);
   });
 
   redis.on("error", function(error) {
