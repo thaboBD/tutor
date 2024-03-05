@@ -17,19 +17,20 @@ exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   const response = new MessagingResponse();
 
   if(!req.user){
-    sendError()
+    sendError(senderNumber, query)
     return res.send(response.toString()).status(200);
   }
 
-  message = await checkCache()
+  message = await checkCache(query)
+
   if(message){
     twilio.sendTwilioResponse(message, senderNumber, query);
     return res.send(response.toString()).status(200);
   }
 
-  query = NumMedia > 0 ? "image" : query;
-  const result = requestDialogFlow(senderNumber, query, mediaUrl);
-  if (result) twilio.sendTwilioResponse(result, senderNumber, query);
+  let queryy = NumMedia > 0 ? "image" : query;
+  const result = requestDialogFlow(senderNumber, queryy, mediaUrl);
+  if (result) twilio.sendTwilioResponse(result, senderNumber, queryy);
 
   return res.send(response.toString()).status(200);
 });
