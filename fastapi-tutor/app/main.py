@@ -11,7 +11,11 @@ import logging
 import os
 from datetime import datetime
 from .mathpix import readImage
+<<<<<<< HEAD
 from .gpt import getGptResponse, getWorking
+=======
+from .gpt import getGptResponse
+>>>>>>> 9ccc37b (a tons of optimizations, need to test on prod)
 from pprint import pprint
 import aioredis
 
@@ -160,9 +164,8 @@ async def decide_intent_find_result(intent, query, image_url):
     else:
         return ''
 
-
 async def publish_response(result, context_number, query):
-    redis = await aioredis.Redis.from_url("redis://redis")
+        redis = await aioredis.Redis.from_url("redis://redis")
 
-    data = {'result': result, 'From': context_number, 'query': query}
-    await redis.publish('fastapi-response', str(data))
+        data = {'result': result, 'From': context_number, 'query': query}
+        await redis.publish('fastapi-response', str(data))
