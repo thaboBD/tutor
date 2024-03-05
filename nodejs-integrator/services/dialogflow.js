@@ -9,10 +9,10 @@ const projectId = process.env.DIALOGFLOW_PROJECTID;
 const keyFilePath = process.env.DIALOGFLOW_CREDENTIALS_PATH;
 const { struct } = require("pb-util");
 
-const redis = require("./redis");
+const { redis } = require("./redis");
 
 exports.requestDialogFlow = catchAsync(
-  async (phoneNumber, query, mediaUrl, startTime) => {
+  async (phoneNumber, query, mediaUrl) => {
     const sessionClient = new dialogflow.SessionsClient({
       keyFilename: keyFilePath,
     });

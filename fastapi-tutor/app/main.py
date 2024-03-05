@@ -11,11 +11,7 @@ import os
 from datetime import datetime
 from .mathpix import readImage
 from .gpt import getGptResponse
-import requests
 from pprint import pprint
-import aiohttp
-import asyncio
-import urllib.parse
 import aioredis
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -51,10 +47,7 @@ async def webhook(info : Request):
     intent, query, context_number, image_url = await extract_data_from_request(info)
     result = await decide_intent_find_result(intent, query, image_url)
     response = FulfillmentResponse(fulfillmentText=result)
-
-    if result and context_number:
-        await send_webhook_request(result, context_number, query)
-
+    await publish_response(result, context_number, query)
     return response
 
 
@@ -158,10 +151,8 @@ async def decide_intent_find_result(intent, query, image_url):
     else:
         return ''
 
-async def send_webhook_request(result, context_number, query):
-        webhook_url = NODE_JS_WEBHOOK_URL
+async def publish_response(result, context_number, query):
+        redis = await aioredis.Redis.from_url("redis://redis")
 
         data = {'result': result, 'From': context_number, 'query': query}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(webhook_url, data=data) as response:
-                return await response.text()
+        await redis.publish('fastapi-response', str(data))

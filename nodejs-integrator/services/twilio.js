@@ -6,25 +6,34 @@ const catchAsync = require("../utils/catchAsync");
 const axios = require("axios");
 const util = require("util");
 
-const redis = require("./redis");
+const {redis} = require("./redis");
 const getAsync = util.promisify(redis.get).bind(redis);
 
 exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) => {
   console.log("*********TWILIO*********");
+  if (!message || !responseNumber) return;
 
+  // donot send reponse if already sent, expires after 5 seconds
   const uniqueKey = `${query}:${responseNumber}`;
-
-   // donot send reponse if already sent, expires after 5 seconds
   const isAlreadySent = await getAsync(uniqueKey);
-  if(isAlreadySent) return;
+  if(isAlreadySent){
+    return;
+  }else{
+    redis.set(uniqueKey, true , "EX", 5);
+  }
 
-  if (!message) return;
+  const isAlreadyCached = await getAsync(query);
+  if(!isAlreadyCached){
+    redis.set(query, message, "EX", 60);
+  }
 
-  redis.set(uniqueKey, true , "EX", 5);
+  maxRetries=3
+  await attemptSend(maxRetries);
+});
 
-  const maxRetries = 3;
+
+const attemptSend = async (retriesLeft) => {
   let retryDelay = 1000;
-  async function attemptSend(retriesLeft) {
     try {
       await client.messages.create({
         from: twilioNumber,
@@ -44,10 +53,7 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
         console.error("Error sending message:", error);
       }
     }
-  }
-  await attemptSend(maxRetries);
-});
-
+}
 exports.imageS3Path = async (url) => {
   if(!url) return Promise.resolve('no-image-attached');
 
