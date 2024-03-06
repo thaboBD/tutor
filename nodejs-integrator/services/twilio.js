@@ -16,16 +16,14 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
 
    // donot send reponse if already sent, expires after 5 seconds
   const isAlreadySent = await getAsync(uniqueKey);
-  console.log("IS ALREADY", uniqueKey, isAlreadySent);
   if(isAlreadySent) return;
+
   if (!message) return;
 
-  console.log("MESSAGE BEING SENT: ", message);
-
   redis.set(uniqueKey, true , "EX", 5);
+
   const maxRetries = 3;
   let retryDelay = 1000;
-
   async function attemptSend(retriesLeft) {
     try {
       await client.messages.create({
@@ -47,7 +45,6 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
       }
     }
   }
-
   await attemptSend(maxRetries);
 });
 
