@@ -1,3 +1,5 @@
+const util = require("util");
+
 const { requestDialogFlow } = require("../services/dialogflow");
 const { uploadFile } = require("../services/s3");
 
@@ -5,45 +7,41 @@ const catchAsync = require("../utils/catchAsync");
 const { MessagingResponse } = require("twilio").twiml;
 const twilio = require("../services/twilio");
 
-exports.twilioRequestHook = catchAsync(async (req, res, next) => {
-  const startTime = Date.now();
+const { redis } = require("../services/redis");
+const getAsync = util.promisify(redis.get).bind(redis);
 
+exports.twilioRequestHook = catchAsync(async (req, res, next) => {
   const { body } = req;
-  const { NumMedia, From: senderNumber, MessageSid, Body } = body;
+  const { NumMedia, From: senderNumber, MessageSid, Body: query } = body;
   const mediaUrl = body[`MediaUrl${0}`];
   const response = new MessagingResponse();
 
-  console.log("USER ID: ", !req.user);
-
-  if (!req.user) {
-    message =
-      "This phone number is not registered for conversation, please get yourself registered first. Thanks";
-
-    twilio.sendTwilioResponse(message, senderNumber, Body);
+  if(!req.user){
+    sendError(senderNumber, query)
     return res.send(response.toString()).status(200);
   }
 
-  // will upload to s3 if required
-  // const imageLocation = uploadFile(mediaItem);
-  const query = NumMedia > 0 ? "image" : Body;
+  message = await checkCache(query)
 
-  const result = requestDialogFlow(senderNumber, query, mediaUrl, startTime);
+  if(message){
+    twilio.sendTwilioResponse(message, senderNumber, query);
+    return res.send(response.toString()).status(200);
+  }
 
-  if (result) twilio.sendTwilioResponse(result, senderNumber, query);
+  let queryy = NumMedia > 0 ? "image" : query;
+  const result = requestDialogFlow(senderNumber, queryy, mediaUrl);
+  if (result) twilio.sendTwilioResponse(result, senderNumber, queryy);
 
   return res.send(response.toString()).status(200);
 });
 
-exports.fastApiResponseHook = catchAsync(async (req, res, next) => {
-  const { query, result, From: senderNumber } = req.body;
+const sendError = (senderNumber, query) => {
+    message =
+      "This phone number is not registered for conversation, please get yourself registered first. Thanks";
 
-  console.log("RESPONSE HOOK", query)
+    twilio.sendTwilioResponse(message, senderNumber, query);
+}
 
-  let phoneNumber = senderNumber.includes("whatsapp")
-    ? senderNumber
-    : `whatsapp${senderNumber}`;
-
-  if (result) twilio.sendTwilioResponse(result, phoneNumber, query);
-
-  res.type("text/xml").send("success");
-});
+const checkCache = async (query) => {
+  return await getAsync(query);
+}

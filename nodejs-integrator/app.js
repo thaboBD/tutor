@@ -12,6 +12,7 @@ const conversationRouter = require("./routes/conversationRoutes");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
+const { setupFastApiListerners } = require('./services/redis')
 
 const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
@@ -51,6 +52,8 @@ app.use((req, res, next) => {
   console.log(req.cookies);
   next();
 });
+
+setupFastApiListerners()
 
 // API Routes
 app.use("/api/v1/users", userRouter);

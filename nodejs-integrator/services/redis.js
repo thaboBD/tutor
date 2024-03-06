@@ -5,4 +5,31 @@ const redis = new Redis({
   port: process.env.REDIS_PORT,
 });
 
-module.exports = redis;
+const setupFastApiListerners = async () => {
+  const subscriber = new Redis({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  });
+
+  console.log("SETTING UP LISTENERS");
+
+  subscriber.subscribe("fastapi-response");
+
+  subscriber.on("message", function(channel, data) {
+    let { result, From, query } = data;
+
+    console.log(`Received message from channel ${channel}: ${data}`);
+
+    let phoneNumber = From?.includes("whatsapp")
+      ? senderNumber
+      : `whatsapp${senderNumber}`;
+
+    twilio.sendTwilioResponse(result, phoneNumber, query);
+  });
+
+  subscriber.on("error", function(error) {
+    console.error("Redis error:", error);
+  });
+};
+
+module.exports = {setupFastApiListerners, redis};

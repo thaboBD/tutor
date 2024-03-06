@@ -26,6 +26,7 @@ function App() {
     try {
       const response = await axios.post(UsersApi, { email, password });
       const { token } = response.data;
+      if(!token)return;
       localStorage.setItem("token", token);
       setIsLoggedIn(true);
     } catch (error) {
