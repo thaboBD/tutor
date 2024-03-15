@@ -26,8 +26,7 @@ app.use(morgan("dev"));
 
 const corsOption = {
   origin: [
-    "http://localhost:3001",
-    "https://react-admin-app.54.225.46.103.nip.io",
+    "*",
   ],
 };
 app.use(cors(corsOption));
