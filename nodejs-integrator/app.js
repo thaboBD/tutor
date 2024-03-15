@@ -25,9 +25,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 const corsOption = {
-  origin: [
-    "*",
-  ],
+  origin: "*"
 };
 app.use(cors(corsOption));
 // Limit requests from same API
