@@ -2,8 +2,8 @@
 const { User } = require("./models");
 const catchAsync = require("./utils/catchAsync");
 
-const seedSuperUser = catchAsync(async (firstName, lastName, email, phoneNumber, password) => {
-  const superUserExists = await User.findOne({ where: { superUser: true } });
+const seedSuperUser = async (firstName, lastName, email, phoneNumber, password) => {
+  const superUserExists = await User.findOne({ where: { phoneNumber: phoneNumber, superUser: true } });
 
   if (!superUserExists) {
     await User.create({
@@ -19,19 +19,21 @@ const seedSuperUser = catchAsync(async (firstName, lastName, email, phoneNumber,
   } else {
     console.log("Superuser already exists.");
   }
-});
+};
 
 if (process.env.CREATE_SUPERUSER === "true") {
-  firstName=process.env.SUPER_USER_FIRST_NAME
-  lastName=process.env.SUPER_USER_LAST_NAME
-  email=process.env.SUPER_USER_EMAIL
-  phoneNumber=process.env.SUPER_USER_PHONE_NUMBER
-  password=process.env.SUPER_USER_PASSWORD
+  const firstName=process.env.SUPER_USER_FIRST_NAME
+  const lastName=process.env.SUPER_USER_LAST_NAME
+  const email=process.env.SUPER_USER_EMAIL
+  const phoneNumber=process.env.SUPER_USER_PHONE_NUMBER
+  const password=process.env.SUPER_USER_PASSWORD
 
   if(!email || !phoneNumber || !password){
     console.error("SUPER_USER_EMAIL, SUPER_USER_PHONE_NUMBER, SUPER_USER_PASSWORD are required in ENV to proceed.");
     return;
   }
+
+  console.log("PHONE NUMBER: ", phoneNumber);
 
   seedSuperUser(firstName, lastName, email, phoneNumber, password);
 } else {

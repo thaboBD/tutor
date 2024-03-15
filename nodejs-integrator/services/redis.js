@@ -11,12 +11,10 @@ const setupFastApiListerners = async () => {
     port: process.env.REDIS_PORT,
   });
 
-  console.log("SETTING UP LISTENERS");
-
   subscriber.subscribe("fastapi-response");
 
   subscriber.on("message", function(channel, data) {
-    let { result, From, query } = data;
+    let { result, From: senderNumber, query } = data;
 
     console.log(`Received message from channel ${channel}: ${data}`);
 

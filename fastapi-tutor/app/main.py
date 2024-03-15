@@ -168,4 +168,4 @@ async def publish_response(result, context_number, query):
         redis = await aioredis.Redis.from_url("redis://redis")
 
         data = {'result': result, 'From': context_number, 'query': query}
-        await redis.publish('fastapi-response', str(data))
+        if(context_number): await redis.publish('fastapi-response', str(data))

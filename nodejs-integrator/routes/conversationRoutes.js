@@ -9,10 +9,5 @@ router.post(
   authController.protect,
   conversationsController.twilioRequestHook
 );
-router.post(
-  "/response",
-  // authController.protect,
-  // conversationsController.fastApiResponseHook
-);
 
 module.exports = router;
