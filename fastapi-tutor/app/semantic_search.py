@@ -12,8 +12,11 @@ from langchain.chat_models import ChatOpenAI
 
 
 load_dotenv()
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-directory = 'data'
+data_dir = os.path.join(script_dir, '..', 'data')
+
+directory = data_dir
 pinecone.init(api_key=os.getenv("PINECONE_API_KEY"),
               environment=os.getenv("PINECONE_ENV"))
 openai.api_key = os.getenv("OPENAI_API_KEY")
