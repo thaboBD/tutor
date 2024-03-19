@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List
 from .pdf_util import extract_pdf_text
 # from .semantic_search import get_answer
+from semantic_search import get_answer
 # from calculator import calculate as calculated
 from .langchain_util import run_agent as calculated
 from pydantic import BaseModel
@@ -37,12 +38,14 @@ class QueryModel(BaseModel):
 class FulfillmentResponse(BaseModel):
     fulfillmentText: str
 
+
 @app.get("/")
 def home():
     return "Welcome to the home page."
 
+
 @app.post("/webhook", response_model=FulfillmentResponse)
-async def webhook(info : Request):
+async def webhook(info: Request):
     print("WHEBHOOK CALLED")
     intent, query, context_number, image_url = await extract_data_from_request(info)
     result = await decide_intent_find_result(intent, query, image_url)
@@ -63,7 +66,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         content_index[file.filename] = pdf_text
 
         responses.append({"filename": file.filename,
-                        "message": "PDF uploaded and indexed successfully."})
+                          "message": "PDF uploaded and indexed successfully."})
 
     return responses
 
@@ -72,7 +75,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 def search(query: QueryModel):
     results = get_answer(query.query)
 
-    return 'results'
+    return results
 
 
 @app.post("/calculate/")
@@ -80,10 +83,12 @@ async def calculate(query: QueryModel):
     results = calculated(query.query)
     return results
 
+
 @app.post("/exercises/")
 async def exercises(query: QueryModel):
     results = getGptResponse(query.query)
     return results
+
 
 @app.post("/read-image/")
 async def upload_image(file: UploadFile = File(...)):
@@ -104,6 +109,7 @@ async def upload_image(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
+
 async def extract_data_from_request(info):
     try:
         redis = await aioredis.Redis.from_url("redis://redis")
@@ -111,7 +117,6 @@ async def extract_data_from_request(info):
         query_result = json_request.get("queryResult", {})
         output_contexts = query_result.get("outputContexts", [])
         output_context = output_contexts[0]["name"] if output_contexts else None
-
 
         intent = query_result.get("intent", {}).get("displayName", None)
         query = query_result.get("queryText", None)
@@ -137,6 +142,7 @@ async def extract_data_from_request(info):
         print("Exception occurred while extracting data from request:", e)
         return None, None, None, None
 
+
 async def decide_intent_find_result(intent, query, image_url):
     print("INTENT", intent, query, image_url)
     if intent == 'calculate':
@@ -144,7 +150,7 @@ async def decide_intent_find_result(intent, query, image_url):
     elif intent == 'exercises':
         return await exercises(QueryModel(query=query))
     elif intent == 'search-topic':
-        return await calculate(QueryModel(query=query))
+        return await search(QueryModel(query=query))
     elif intent == 'read-image' and image_url:
         image_data = readImage(image_url)
         query = str(image_data)
@@ -152,8 +158,9 @@ async def decide_intent_find_result(intent, query, image_url):
     else:
         return ''
 
-async def publish_response(result, context_number, query):
-        redis = await aioredis.Redis.from_url("redis://redis")
 
-        data = {'result': result, 'From': context_number, 'query': query}
-        await redis.publish('fastapi-response', str(data))
+async def publish_response(result, context_number, query):
+    redis = await aioredis.Redis.from_url("redis://redis")
+
+    data = {'result': result, 'From': context_number, 'query': query}
+    await redis.publish('fastapi-response', str(data))
