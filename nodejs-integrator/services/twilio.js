@@ -28,16 +28,16 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
     redis.set(query, message, "EX", 60);
   }
 
-  maxRetries=3
-  await attemptSend(maxRetries, message, responseNumber);
+  const maxRetries=3
+  const retryDelay = 1000;
+  await attemptSend(maxRetries, message, responseNumber, retryDelay);
 });
 
 
 const attemptSend = async (retriesLeft, message, responseNumber) => {
-  let retryDelay = 1000;
     try {
       await client.messages.create({
-        from: twilioNumber,
+        from: 'whatsapp:+61483913059',
         body: message,
         to: responseNumber,
       });
@@ -48,13 +48,13 @@ const attemptSend = async (retriesLeft, message, responseNumber) => {
           `Rate limited. Retrying in ${retryDelay / 1000} seconds...`
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
-        retryDelay *= 2;
-        await attemptSend(retriesLeft - 1);
+        await attemptSend(retriesLeft -1 , message, responseNumber, retryDelay* 2);
       } else {
         console.error("Error sending message:", error);
       }
     }
 }
+
 exports.imageS3Path = async (url) => {
   if(!url) return Promise.resolve('no-image-attached');
 
