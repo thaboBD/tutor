@@ -11,7 +11,7 @@ import logging
 import os
 from datetime import datetime
 from .mathpix import readImage
-from .gpt import getGptResponse
+from .gpt import getGptResponse, getworking
 from pprint import pprint
 import aioredis
 
@@ -73,15 +73,18 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 
 @app.post("/search/")
 def search(query: QueryModel):
-    results = get_answer(query.query)
+    # results = get_answer(query.query)
 
     return results
 
 
 @app.post("/calculate/")
 async def calculate(query: QueryModel):
-    results = calculated(query.query)
-    return results
+    answer = calculated(query.query)
+    showStepsQuery = "the question is " + query.query + "the answer is " + answer
+    result = getworking(showStepsQuery)
+    return result
+
 
 
 @app.post("/exercises/")
