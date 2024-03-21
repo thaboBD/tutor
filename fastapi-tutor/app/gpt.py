@@ -37,7 +37,7 @@ def getGptResponse(prompt):
     return answer
 
 
-def getworking(prompt):
+def getWorking(prompt):
     intent = sanitize_Input(prompt)
     messages = []
     messages.append(
