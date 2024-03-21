@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List
 from .pdf_util import extract_pdf_text
 # from .semantic_search import get_answer
-from semantic_search import get_answer
+# from semantic_search import get_answer
 # from calculator import calculate as calculated
 from .langchain_util import run_agent as calculated
 from pydantic import BaseModel
@@ -75,7 +75,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 def search(query: QueryModel):
     # results = get_answer(query.query)
 
-    return results
+    return 'results'
 
 
 @app.post("/calculate/")
