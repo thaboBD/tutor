@@ -10,7 +10,7 @@ import logging
 import os
 from datetime import datetime
 from .mathpix import readImage
-from .gpt import getGptResponse, getworking
+from .gpt import getGptResponse, getWorking
 from pprint import pprint
 import aioredis
 
@@ -81,7 +81,7 @@ def search(query: QueryModel):
 async def calculate(query: QueryModel):
     answer = calculated(query.query)
     showStepsQuery = "the question is " + query.query + "the answer is " + answer
-    result = getworking(showStepsQuery)
+    result = getWorking(showStepsQuery)
     return result
 
 
