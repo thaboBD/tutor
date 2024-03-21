@@ -11,7 +11,7 @@ import logging
 import os
 from datetime import datetime
 from .mathpix import readImage
-from .gpt import getGptResponse, getworking
+from .gpt import getGptResponse, getWorking
 from pprint import pprint
 import aioredis
 
@@ -82,9 +82,8 @@ def search(query: QueryModel):
 async def calculate(query: QueryModel):
     answer = calculated(query.query)
     showStepsQuery = "the question is " + query.query + "the answer is " + answer
-    result = getworking(showStepsQuery)
+    result = getWorking(showStepsQuery)
     return result
-
 
 
 @app.post("/exercises/")
@@ -153,7 +152,7 @@ async def decide_intent_find_result(intent, query, image_url):
     elif intent == 'exercises':
         return await exercises(QueryModel(query=query))
     elif intent == 'search-topic':
-        return await search(QueryModel(query=query))
+        return await calculate(QueryModel(query=query))
     elif intent == 'read-image' and image_url:
         image_data = readImage(image_url)
         query = str(image_data)
