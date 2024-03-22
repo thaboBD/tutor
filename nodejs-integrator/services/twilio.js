@@ -18,10 +18,10 @@ exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) =
   const isAlreadySent = await getAsync(uniqueKey);
 
   if(isAlreadySent){
+    console.log("RESPONSE IS ALREADY SENT < 5 seconds")
     return;
-  }else{
-    redis.set(uniqueKey, true , "EX", 5);
   }
+  redis.set(uniqueKey, true , "EX", 5);
 
   const isAlreadyCached = await getAsync(query);
   if(!isAlreadyCached){
