@@ -25,7 +25,6 @@ const setupFastApiListerners = async () => {
       ? senderNumber
       : `whatsapp${senderNumber}`;
 
-    console.log("SENDING TO TWILIO", result, phoneNumber, query)
     twilio.sendTwilioResponse(result, phoneNumber, query);
   });
 
