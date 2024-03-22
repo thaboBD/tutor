@@ -11,7 +11,12 @@ const getAsync = util.promisify(redis.get).bind(redis);
 
 exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) => {
   console.log("*********TWILIO*********");
-  if (!message || !responseNumber) return;
+  if (!message || !responseNumber) {
+    console.log(message)
+    console.log(responseNumber)
+    console.error("EMPTY MESSAGE OR RESPONSE NUMBER");
+    return;
+  }
 
   // donot send reponse if already sent, expires after 5 seconds
   const uniqueKey = `${query}:${responseNumber}`;
