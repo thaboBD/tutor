@@ -15,6 +15,7 @@ const setupFastApiListerners = async () => {
   subscriber.subscribe("fastapi-response");
 
   subscriber.on("message", function(channel, data) {
+    console.log("DATA: ", data)
     let parsedData = JSON.parse(data);
     let { result, From: senderNumber, query } = parsedData;
 
