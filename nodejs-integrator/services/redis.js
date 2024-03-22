@@ -15,7 +15,8 @@ const setupFastApiListerners = async () => {
   subscriber.subscribe("fastapi-response");
 
   subscriber.on("message", function(channel, data) {
-    let { result, From: senderNumber, query } = data;
+    let parsedData = JSON.parse(data);
+    let { result, From: senderNumber, query } = parsedData;
 
     console.log(`Received message from channel ${channel}: ${data}`);
 
@@ -23,6 +24,7 @@ const setupFastApiListerners = async () => {
       ? senderNumber
       : `whatsapp${senderNumber}`;
 
+    console.log("SENDING TO TWILIO", result, phoneNumber, query)
     twilio.sendTwilioResponse(result, phoneNumber, query);
   });
 
