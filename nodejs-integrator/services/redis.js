@@ -15,11 +15,11 @@ const setupFastApiListerners = async () => {
   subscriber.subscribe("fastapi-response");
 
   subscriber.on("message", function(channel, data) {
+    console.log(`Received message from channel ${channel}: ${data}`);
     let validJsonString = data.replace(/'/g, '"');
     let parsedData = JSON.parse(validJsonString);
     let { result, From: senderNumber, query } = parsedData;
 
-    console.log(`Received message from channel ${channel}: ${data}`);
 
     let phoneNumber = senderNumber?.includes("whatsapp")
       ? senderNumber
