@@ -1,4 +1,5 @@
 const Redis = require("ioredis");
+const twilio = require("./twilio")
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
@@ -11,16 +12,16 @@ const setupFastApiListerners = async () => {
     port: process.env.REDIS_PORT,
   });
 
-  console.log("SETTING UP LISTENERS");
-
   subscriber.subscribe("fastapi-response");
 
   subscriber.on("message", function(channel, data) {
-    let { result, From, query } = data;
-
     console.log(`Received message from channel ${channel}: ${data}`);
+    let validJsonString = data.replace(/'/g, '"');
+    let parsedData = JSON.parse(validJsonString);
+    let { result, From: senderNumber, query } = parsedData;
 
-    let phoneNumber = From?.includes("whatsapp")
+
+    let phoneNumber = senderNumber?.includes("whatsapp")
       ? senderNumber
       : `whatsapp${senderNumber}`;
 

@@ -11,30 +11,35 @@ const getAsync = util.promisify(redis.get).bind(redis);
 
 exports.sendTwilioResponse = catchAsync(async (message, responseNumber, query) => {
   console.log("*********TWILIO*********");
-  if (!message || !responseNumber) return;
+  if (!message || !responseNumber) {
+    console.log(message)
+    console.log(responseNumber)
+    console.error("EMPTY MESSAGE OR RESPONSE NUMBER");
+    return;
+  }
 
   // donot send reponse if already sent, expires after 5 seconds
   const uniqueKey = `${query}:${responseNumber}`;
   const isAlreadySent = await getAsync(uniqueKey);
 
   if(isAlreadySent){
+    console.log("RESPONSE IS ALREADY SENT < 5 seconds")
     return;
-  }else{
-    redis.set(uniqueKey, true , "EX", 5);
   }
+  redis.set(uniqueKey, true , "EX", 5);
 
   const isAlreadyCached = await getAsync(query);
   if(!isAlreadyCached){
     redis.set(query, message, "EX", 60);
   }
 
-  maxRetries=3
-  await attemptSend(maxRetries, message, responseNumber);
+  const maxRetries=3
+  const retryDelay = 1000;
+  await attemptSend(maxRetries, message, responseNumber, retryDelay);
 });
 
 
 const attemptSend = async (retriesLeft, message, responseNumber) => {
-  let retryDelay = 1000;
     try {
       await client.messages.create({
         from: twilioNumber,
@@ -48,13 +53,13 @@ const attemptSend = async (retriesLeft, message, responseNumber) => {
           `Rate limited. Retrying in ${retryDelay / 1000} seconds...`
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
-        retryDelay *= 2;
-        await attemptSend(retriesLeft - 1);
+        await attemptSend(retriesLeft -1 , message, responseNumber, retryDelay* 2);
       } else {
         console.error("Error sending message:", error);
       }
     }
 }
+
 exports.imageS3Path = async (url) => {
   if(!url) return Promise.resolve('no-image-attached');
 

@@ -160,9 +160,8 @@ async def decide_intent_find_result(intent, query, image_url):
     else:
         return ''
 
-
 async def publish_response(result, context_number, query):
-    redis = await aioredis.Redis.from_url("redis://redis")
+        redis = await aioredis.Redis.from_url("redis://redis")
 
-    data = {'result': result, 'From': context_number, 'query': query}
-    await redis.publish('fastapi-response', str(data))
+        data = {'result': result, 'From': context_number, 'query': query}
+        if(context_number): await redis.publish('fastapi-response', str(data))

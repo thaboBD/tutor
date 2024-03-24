@@ -25,10 +25,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 const corsOption = {
-  origin: [
-    "http://localhost:3001",
-    "https://react-admin-app.54.225.46.103.nip.io",
-  ],
+  origin: "*"
 };
 app.use(cors(corsOption));
 // Limit requests from same API
